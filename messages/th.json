@@ -1,0 +1,36 @@
+{
+  "HomePage": {
+    "title": "สร้าง Next App",
+    "description": "สร้างโดย create next app",
+    "getStarted": "เริ่มต้นโดยการแก้ไข",
+    "saveChanges": "บันทึกและดูการเปลี่ยนแปลงทันที",
+    "deployNow": "เผยแพร่ตอนนี้",
+    "readDocs": "อ่านเอกสาร",
+    "learn": "เรียนรู้",
+    "examples": "ตัวอย่าง",
+    "goToNextjs": "ไปที่ nextjs.org →"
+  },
+  "Navigation": {
+    "language": "ภาษา",
+    "english": "English",
+    "thai": "ไทย",
+    "signIn": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ",
+    "profile": "โปรไฟล์"
+  },
+  "Auth": {
+    "signIn": "เข้าสู่ระบบ",
+    "signUp": "สมัครสมาชิก",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "noAccount": "ยังไม่มีบัญชี?",
+    "hasAccount": "มีบัญชีแล้ว?",
+    "signInWithGoogle": "เข้าสู่ระบบด้วย Google",
+    "signInWithGithub": "เข้าสู่ระบบด้วย GitHub",
+    "or": "หรือ",
+    "welcome": "ยินดีต้อนรับกลับ!",
+    "createAccount": "สร้างบัญชีของคุณ"
+  }
+}
