@@ -244,11 +244,7 @@ export class AdminService {
 
   async getUserStatistics(): Promise<{ data: UserStatistics[] | null; error: unknown }> {
     try {
-      const { data, error } = await this.supabase
-        .from('user_statistics')
-        .select('*')
-        .order('date', { ascending: false })
-        .limit(30) // Last 30 days
+      const { data, error } = await this.supabase.rpc('get_user_statistics')
 
       if (error) {
         return { data: null, error }

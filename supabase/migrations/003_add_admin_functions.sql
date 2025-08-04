@@ -1,17 +1,12 @@
 -- Add admin-related functions
 
--- Function to check if current user is admin
+-- Function to check if current user is admin (uses the non-recursive function)
 CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN AS $
+RETURNS BOOLEAN AS $$
 BEGIN
-    RETURN EXISTS (
-        SELECT 1 FROM public.profiles 
-        WHERE user_id = auth.uid() 
-        AND role = 'admin'
-        AND status = 'active'
-    );
+    RETURN public.is_admin_user();
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to suspend a user
 CREATE OR REPLACE FUNCTION public.suspend_user(
@@ -19,7 +14,7 @@ CREATE OR REPLACE FUNCTION public.suspend_user(
     suspend_until TIMESTAMP WITH TIME ZONE,
     reason TEXT
 )
-RETURNS VOID AS $
+RETURNS VOID AS $$
 BEGIN
     -- Check if current user is admin
     IF NOT public.is_admin() THEN
@@ -34,11 +29,11 @@ BEGIN
         updated_by = auth.uid()
     WHERE user_id = target_user_id;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to unsuspend a user
 CREATE OR REPLACE FUNCTION public.unsuspend_user(target_user_id UUID)
-RETURNS VOID AS $
+RETURNS VOID AS $$
 BEGIN
     -- Check if current user is admin
     IF NOT public.is_admin() THEN
@@ -53,7 +48,7 @@ BEGIN
         updated_by = auth.uid()
     WHERE user_id = target_user_id;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to log admin actions
 CREATE OR REPLACE FUNCTION public.log_admin_action(
@@ -61,7 +56,7 @@ CREATE OR REPLACE FUNCTION public.log_admin_action(
     target_user UUID DEFAULT NULL,
     action_details JSONB DEFAULT NULL
 )
-RETURNS VOID AS $
+RETURNS VOID AS $$
 BEGIN
     INSERT INTO public.admin_logs (
         admin_id,
@@ -77,25 +72,6 @@ BEGIN
         NOW()
     );
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Add RLS policies for admin functions
-CREATE POLICY "Admins can view all profiles" ON public.profiles
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles p 
-            WHERE p.user_id = auth.uid() 
-            AND p.role = 'admin'
-            AND p.status = 'active'
-        )
-    );
-
-CREATE POLICY "Admins can update all profiles" ON public.profiles
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles p 
-            WHERE p.user_id = auth.uid() 
-            AND p.role = 'admin'
-            AND p.status = 'active'
-        )
-    );
+-- Note: Admin policies are already defined in migration 002

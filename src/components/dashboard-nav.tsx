@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/contexts/AdminContext';
+import { useHydration } from '@/hooks/useHydration';
 import { Link } from '@/i18n/routing';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -52,12 +53,19 @@ const navigation = [
 ];
 
 export function DashboardNav() {
-  const { user, profile, signOut } = useAuth();
-  const { isAdmin, loading: adminLoading } = useAdmin();
+  const { user, profile: authProfile, signOut } = useAuth();
+  const { isAdmin, loading: adminLoading, profile: adminProfile } = useAdmin();
   const pathname = usePathname();
+  const hydrated = useHydration();
+
+  // Use admin profile if available, fallback to auth profile
+  const profile = adminProfile || authProfile;
 
   // Debug: log admin status
   console.log('DashboardNav - isAdmin:', isAdmin, 'adminLoading:', adminLoading, 'profile role:', profile?.role);
+
+  // Prevent hydration mismatch by not showing admin section until hydrated and loaded
+  const shouldShowAdmin = hydrated && !adminLoading && (isAdmin || (profile?.role === 'admin' && profile?.status === 'active'));
 
   const adminNavigation = [
     {
@@ -108,7 +116,7 @@ export function DashboardNav() {
         })}
 
         {/* Admin Section */}
-        {(isAdmin || (profile?.role === 'admin' && profile?.status === 'active')) && (
+        {shouldShowAdmin && (
           <>
             <div className="pt-6">
               <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -147,11 +155,15 @@ export function DashboardNav() {
         {process.env.NODE_ENV === 'development' && (
           <div className="px-3 py-2 text-xs text-gray-500 space-y-1">
             <div>Debug Info:</div>
+            <div>hydrated: {String(hydrated)}</div>
+            <div>hasUser: {String(!!user)}</div>
+            <div>hasAuthProfile: {String(!!authProfile)}</div>
+            <div>hasAdminProfile: {String(!!adminProfile)}</div>
             <div>isAdmin: {String(isAdmin)}</div>
             <div>role: {profile?.role}</div>
             <div>status: {profile?.status}</div>
             <div>adminLoading: {String(adminLoading)}</div>
-            <div>showAdmin: {String(isAdmin || (profile?.role === 'admin' && profile?.status === 'active'))}</div>
+            <div>showAdmin: {String(shouldShowAdmin)}</div>
           </div>
         )}
       </nav>

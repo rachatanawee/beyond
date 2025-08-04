@@ -114,7 +114,7 @@ CREATE TRIGGER on_profiles_updated
 
 -- Create function to update login statistics
 CREATE OR REPLACE FUNCTION public.update_login_stats(target_user_id UUID)
-RETURNS VOID AS $
+RETURNS VOID AS $$
 BEGIN
     UPDATE public.profiles 
     SET 
@@ -122,4 +122,4 @@ BEGIN
         login_count = COALESCE(login_count, 0) + 1
     WHERE user_id = target_user_id;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
