@@ -1,0 +1,776 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/contexts/AdminContext";
+import { useRouter } from "@/i18n/routing";
+import { UserWithAdmin } from "@/types/admin";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { DashboardNav } from "@/components/dashboard-nav";
+import {
+  Users,
+  Search,
+  Download,
+  Trash2,
+  Ban,
+  UserCheck,
+  UserX,
+  Clock,
+  Mail,
+  UserPlus,
+  Phone,
+  MapPin,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+  RefreshCw,
+} from "lucide-react";
+
+type NewUserFormState = {
+  email: string;
+  password: string;
+  full_name: string;
+  role: 'user' | 'admin' | 'moderator';
+};
+
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'An unexpected error occurred. Please try again.';
+};
+
+export default function UserMaintenancePage() {
+  const { profile: authProfile, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading, profile: adminProfile, users, adminService, refreshUsers } = useAdmin();
+  const router = useRouter();
+  // Wait for both auth and admin contexts to finish loading
+  const loading = authLoading || adminLoading;
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [selectedUser, setSelectedUser] = useState<UserWithAdmin | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newUser, setNewUser] = useState<NewUserFormState>({
+    email: "",
+    password: "",
+    full_name: "",
+    role: "user",
+  });
+  const [isSuspendDialogOpen, setIsSuspendDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
+  const [suspendUntil, setSuspendUntil] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error">(
+    "success"
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Combine profiles and create a more robust authorization check, similar to DashboardNav
+  const profile = adminProfile || authProfile;
+  const isAuthorized = isAdmin || (profile?.role === 'admin' && profile?.status === 'active');
+
+  useEffect(() => {
+    if (!loading && !isAuthorized) {
+      router.push("/");
+    }
+  }, [isAuthorized, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen">
+        <DashboardNav />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-lg">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // After loading, if the user is not an admin, render nothing.
+  // The useEffect below will handle redirecting them to the home page.
+  // This prevents non-admins from seeing the page content even for a moment.
+  if (!isAuthorized) {
+    return null;
+  }
+
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || user.status === statusFilter;
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+
+    return matchesSearch && matchesStatus && matchesRole;
+  });
+
+  const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password || !newUser.full_name) return;
+
+    setIsLoading(true);
+    // This assumes a `createUser` method exists in your adminService
+    // that handles both auth user and profile creation on the backend.
+    const { error } = await adminService.createUser(newUser);
+
+    if (error) {
+      setMessage(`Failed to create user: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User created successfully");
+      setMessageType("success");
+      await refreshUsers();
+      setIsCreateDialogOpen(false);
+      // Reset form
+      setNewUser({ email: "", password: "", full_name: "", role: "user" });
+    }
+    setIsLoading(false);
+  };
+
+  const handleUpdateRole = async (
+    userId: string,
+    newRole: "user" | "admin" | "moderator"
+  ) => {
+    setIsLoading(true);
+    const { error } = await adminService.updateUserRole(userId, newRole);
+
+    if (error) {
+      setMessage(`Failed to update role: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User role updated successfully");
+      setMessageType("success");
+      await refreshUsers();
+    }
+    setIsLoading(false);
+  };
+
+  const handleSuspendUser = async () => {
+    if (!selectedUser || !suspendUntil || !suspendReason) return;
+
+    setIsLoading(true);
+    const { error } = await adminService.suspendUser({
+      userId: selectedUser.user_id,
+      suspendUntil,
+      reason: suspendReason,
+    });
+
+    if (error) {
+      setMessage(`Failed to suspend user: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User suspended successfully");
+      setMessageType("success");
+      await refreshUsers();
+      setIsSuspendDialogOpen(false);
+      setSuspendReason("");
+      setSuspendUntil("");
+    }
+    setIsLoading(false);
+  };
+
+  const handleUnsuspendUser = async (userId: string) => {
+    setIsLoading(true);
+    const { error } = await adminService.unsuspendUser(userId);
+
+    if (error) {
+      setMessage(`Failed to unsuspend user: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User unsuspended successfully");
+      setMessageType("success");
+      await refreshUsers();
+    }
+    setIsLoading(false);
+  };
+
+  const handleBanUser = async (userId: string, reason: string) => {
+    setIsLoading(true);
+    const { error } = await adminService.banUser(userId, reason);
+
+    if (error) {
+      setMessage(`Failed to ban user: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User banned successfully");
+      setMessageType("success");
+      await refreshUsers();
+    }
+    setIsLoading(false);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+
+    setIsLoading(true);
+    const { error } = await adminService.deleteUser(selectedUser.user_id);
+
+    if (error) {
+      setMessage(`Failed to delete user: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User deleted successfully");
+      setMessageType("success");
+      await refreshUsers();
+      setIsDeleteDialogOpen(false);
+    }
+    setIsLoading(false);
+  };
+
+  const exportUsers = async (format: "csv" | "json") => {
+    setIsLoading(true);
+    const { data, error } = await adminService.exportUsers(format);
+
+    if (error || !data) {
+      setMessage(`Failed to export users: ${getErrorMessage(error || 'No data returned')}`);
+      setMessageType("error");
+    } else {
+      const blob = new Blob([data], {
+        type: format === "csv" ? "text/csv" : "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `users.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setMessage(`Users exported as ${format.toUpperCase()}`);
+      setMessageType("success");
+    }
+    setIsLoading(false);
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "active":
+        return (
+          <Badge variant="default" className="bg-green-100 text-green-800">
+            Active
+          </Badge>
+        );
+      case "suspended":
+        return <Badge variant="destructive">Suspended</Badge>;
+      case "banned":
+        return (
+          <Badge variant="destructive" className="bg-red-100 text-red-800">
+            Banned
+          </Badge>
+        );
+      case "pending":
+        return <Badge variant="secondary">Pending</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case "admin":
+        return (
+          <Badge variant="default" className="bg-purple-100 text-purple-800">
+            Admin
+          </Badge>
+        );
+      case "moderator":
+        return (
+          <Badge variant="default" className="bg-blue-100 text-blue-800">
+            Moderator
+          </Badge>
+        );
+      case "user":
+        return <Badge variant="outline">User</Badge>;
+      default:
+        return <Badge variant="outline">{role}</Badge>;
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen">
+      <DashboardNav />
+      <main className="flex-1 overflow-y-auto">
+        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">
+                User Maintenance
+              </h2>
+              <p className="text-muted-foreground">
+                Manage user accounts, roles, and permissions
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => exportUsers("csv")}
+                disabled={isLoading}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export CSV
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => exportUsers("json")}
+                disabled={isLoading}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export JSON
+              </Button>
+              <Button onClick={refreshUsers} disabled={isLoading}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
+              <Button
+                onClick={() => setIsCreateDialogOpen(true)}
+                disabled={isLoading}
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Create User
+              </Button>
+            </div>
+          </div>
+
+          {/* Alert Messages */}
+          {message && (
+            <Alert
+              className={
+                messageType === "error"
+                  ? "border-red-200 bg-red-50"
+                  : "border-green-200 bg-green-50"
+              }
+            >
+              {messageType === "error" ? (
+                <AlertCircle className="h-4 w-4 text-red-600" />
+              ) : (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              )}
+              <AlertDescription
+                className={
+                  messageType === "error" ? "text-red-800" : "text-green-800"
+                }
+              >
+                {message}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Filters</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-4">
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search Users</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="search"
+                      placeholder="Search by name or email..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Status Filter</Label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="suspended">Suspended</SelectItem>
+                      <SelectItem value="banned">Banned</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Role Filter</Label>
+                  <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Roles" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Roles</SelectItem>
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="moderator">Moderator</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Results</Label>
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <Users className="h-4 w-4" />
+                    <span>{filteredUsers.length} users found</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Users List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Users ({filteredUsers.length})</CardTitle>
+              <CardDescription>
+                Manage user accounts and permissions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage
+                          src={user.avatar_url || undefined}
+                          alt="Avatar"
+                        />
+                        <AvatarFallback>
+                          {user.full_name?.charAt(0) || user.email.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <h4 className="font-medium">
+                            {user.full_name || "No name"}
+                          </h4>
+                          {getRoleBadge(user.role)}
+                          {getStatusBadge(user.status)}
+                        </div>
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <div className="flex items-center space-x-1">
+                            <Mail className="h-3 w-3" />
+                            <span>{user.email}</span>
+                          </div>
+                          {user.phone && (
+                            <div className="flex items-center space-x-1">
+                              <Phone className="h-3 w-3" />
+                              <span>{user.phone}</span>
+                            </div>
+                          )}
+                          {user.location && (
+                            <div className="flex items-center space-x-1">
+                              <MapPin className="h-3 w-3" />
+                              <span>{user.location}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>
+                              Joined{" "}
+                              {new Date(user.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          {user.last_login_at && (
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                Last login{" "}
+                                {new Date(
+                                  user.last_login_at
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                          )}
+                          <span>Logins: {user.login_count}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      {/* Role Selection */}
+                      <Select
+                        value={user.role}
+                        onValueChange={(value) =>
+                          handleUpdateRole(
+                            user.user_id,
+                            value as "user" | "admin" | "moderator"
+                          )
+                        }
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="moderator">Moderator</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center space-x-1">
+                        {user.status === "suspended" ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUnsuspendUser(user.user_id)}
+                            disabled={isLoading}
+                          >
+                            <UserCheck className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsSuspendDialogOpen(true);
+                            }}
+                            disabled={isLoading}
+                          >
+                            <UserX className="h-4 w-4" />
+                          </Button>
+                        )}
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleBanUser(user.user_id, "Banned by admin")
+                          }
+                          disabled={isLoading || user.status === "banned"}
+                        >
+                          <Ban className="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          disabled={isLoading}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {filteredUsers.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No users found matching your criteria.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Suspend User Dialog */}
+        <Dialog
+          open={isSuspendDialogOpen}
+          onOpenChange={setIsSuspendDialogOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Suspend User</DialogTitle>
+              <DialogDescription>
+                Suspend {selectedUser?.full_name || selectedUser?.email}{" "}
+                temporarily.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="suspend-until">Suspend Until</Label>
+                <Input
+                  id="suspend-until"
+                  type="datetime-local"
+                  value={suspendUntil}
+                  onChange={(e) => setSuspendUntil(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="suspend-reason">Reason</Label>
+                <Textarea
+                  id="suspend-reason"
+                  placeholder="Enter reason for suspension..."
+                  value={suspendReason}
+                  onChange={(e) => setSuspendReason(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsSuspendDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSuspendUser}
+                disabled={!suspendUntil || !suspendReason || isLoading}
+              >
+                Suspend User
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create User Dialog */}
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New User</DialogTitle>
+              <DialogDescription>
+                Enter the details for the new user. An invitation will not be
+                sent; you must provide the password to the user.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-email">Email</Label>
+                <Input
+                  id="new-email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={newUser.email}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={newUser.password}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, password: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-fullname">Full Name</Label>
+                <Input
+                  id="new-fullname"
+                  type="text"
+                  placeholder="John Doe"
+                  value={newUser.full_name}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, full_name: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-role">Role</Label>
+                <Select
+                  value={newUser.role}
+                  onValueChange={(value) => setNewUser({ ...newUser, role: value as NewUserFormState['role'] })}
+                >
+                  <SelectTrigger id="new-role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="moderator">Moderator</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleCreateUser} disabled={isLoading}>
+                Create User
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete User Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete User</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to permanently delete{" "}
+                {selectedUser?.full_name || selectedUser?.email}? This action
+                cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteUser}
+                disabled={isLoading}
+              >
+                Delete User
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </main>
+    </div>
+  );
+}

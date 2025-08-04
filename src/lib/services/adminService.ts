@@ -1,6 +1,14 @@
 import { createClient } from '@/lib/supabase/client'
 import { UserWithAdmin, AdminLog, UserStatistics, SuspendUserData } from '@/types/admin'
 import { ProfileService } from './profileService'
+import { UserProfile } from '@/types/profile'
+
+interface NewUserData {
+  email: string
+  password: string
+  full_name: string
+  role: 'user' | 'admin' | 'moderator'
+}
 
 export class AdminService {
   private supabase = createClient()
@@ -84,6 +92,24 @@ export class AdminService {
       }
 
       return { data, error: null }
+    } catch (error) {
+      return { data: null, error }
+    }
+  }
+
+  async createUser(userData: NewUserData): Promise<{ data: UserProfile | null; error: unknown }> {
+    try {
+      // This invokes a Supabase Edge Function named 'create-user'
+      const { data, error } = await this.supabase.functions.invoke('create-user', {
+        body: userData,
+      })
+
+      if (error) {
+        return { data: null, error }
+      }
+
+      // The edge function is expected to return an object with `data` and `error` properties.
+      return { data: data?.data, error: data?.error }
     } catch (error) {
       return { data: null, error }
     }

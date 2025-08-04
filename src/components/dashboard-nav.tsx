@@ -3,8 +3,9 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useHydration } from '@/hooks/useHydration';
-import { Link } from '@/i18n/routing';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
+import { useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +15,10 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -27,6 +32,7 @@ import {
   LogOut,
   User,
   ChevronDown,
+  Languages,
 } from 'lucide-react';
 
 const navigation = [
@@ -57,6 +63,9 @@ export function DashboardNav() {
   const { isAdmin, loading: adminLoading, profile: adminProfile } = useAdmin();
   const pathname = usePathname();
   const hydrated = useHydration();
+  const router = useRouter();
+  const t = useTranslations('Navigation');
+  const [, startTransition] = useTransition();
 
   // Use admin profile if available, fallback to auth profile
   const profile = adminProfile || authProfile;
@@ -69,6 +78,12 @@ export function DashboardNav() {
   // Prevent hydration mismatch by not showing admin section until hydrated and loaded
   const shouldShowAdmin = hydrated && !adminLoading && (isAdmin || (profile?.role === 'admin' && profile?.status === 'active'));
 
+  const handleLocaleChange = (nextLocale: string) => {
+    startTransition(() => {
+      router.replace(pathname, { locale: nextLocale });
+    });
+  };
+
   const adminNavigation = [
     {
       name: 'Admin Panel',
@@ -76,7 +91,7 @@ export function DashboardNav() {
       icon: Shield,
     },
     {
-      name: 'User Management',
+      name: 'User Maintenance',
       href: '/admin/users',
       icon: Users,
     },
@@ -207,6 +222,22 @@ export function DashboardNav() {
                 Settings
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Languages className="mr-2 h-4 w-4" />
+                <span>{t('language')}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => handleLocaleChange('en')}>
+                    <span>🇺🇸 {t('english')}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLocaleChange('th')}>
+                    <span>🇹🇭 {t('thai')}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut()}>
               <LogOut className="mr-2 h-4 w-4" />

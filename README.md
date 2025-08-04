@@ -193,7 +193,14 @@ The app supports Thai and English languages:
 
 ## Admin Features
 
-- **User Management** - View, edit, suspend, ban users
+- **User Maintenance** - Comprehensive user management interface
+  - Search and filter users by name, email, status, or role
+  - Update user roles (user, moderator, admin)
+  - Suspend users with reason and expiration date
+  - Ban/unban users
+  - Delete user accounts
+  - Export user data (CSV/JSON)
+  - View user details (login history, profile info)
 - **Role Management** - Assign admin/moderator roles
 - **Audit Logs** - Track all admin actions
 - **User Statistics** - Dashboard with user metrics

@@ -89,7 +89,7 @@ export default function AdminDashboard() {
             <TabsContent value="overview" className="space-y-4">
               {/* Statistics Cards */}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push('/admin/users')}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
                   <CardContent>
                     <div className="text-2xl font-bold">{totalUsers}</div>
                     <p className="text-xs text-muted-foreground">
-                      All registered users
+                      Click to manage users
                     </p>
                   </CardContent>
                 </Card>
@@ -152,7 +152,11 @@ export default function AdminDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-4 md:grid-cols-2">
-                    <Button variant="outline" className="h-20 flex-col">
+                    <Button 
+                      variant="outline" 
+                      className="h-20 flex-col"
+                      onClick={() => router.push('/admin/users')}
+                    >
                       <Users className="h-6 w-6 mb-2" />
                       Manage Users
                       <span className="text-xs text-muted-foreground">View and edit user accounts</span>
