@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
-import {NextIntlClientProvider} from 'next-intl';
-import {getMessages} from 'next-intl/server';
-import {routing} from '@/i18n/routing';
-import {notFound} from 'next/navigation';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
-import {AuthProvider} from '@/contexts/AuthContext';
-import AuthButton from '@/components/AuthButton';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { routing } from '@/i18n/routing';
+import { notFound } from 'next/navigation';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { AdminProvider } from '@/contexts/AdminContext';
+import ConditionalNav from '@/components/ConditionalNav';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,15 +29,15 @@ export default async function RootLayout({
   params
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }>) {
-  const {locale} = await params;
-  
+  const { locale } = await params;
+
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as unknown)) {
+  if (!routing.locales.includes(locale as 'en' | 'th')) {
     notFound();
   }
- 
+
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
@@ -49,11 +49,10 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
-            <div className="fixed top-4 right-4 z-50 flex gap-2">
-              <AuthButton />
-              <LanguageSwitcher />
-            </div>
-            {children}
+            <AdminProvider>
+              <ConditionalNav />
+              {children}
+            </AdminProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>
