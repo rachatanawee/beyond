@@ -18,10 +18,7 @@ import {
   Settings,
   FileText,
   BarChart3,
-  Shield,
-  Activity,
-  Clock,
-  AlertTriangle
+  Activity
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -248,7 +245,7 @@ export default function AdminDashboard() {
                     {users.slice(0, 5).map((user) => (
                       <div key={user.id} className="flex items-center space-x-4">
                         <Avatar>
-                          <AvatarImage src={user.avatar_url} alt="Avatar" />
+                          <AvatarImage src={user.avatar_url || undefined} alt="Avatar" />
                           <AvatarFallback>
                             {user.full_name?.charAt(0) || user.email.charAt(0)}
                           </AvatarFallback>

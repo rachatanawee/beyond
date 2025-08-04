@@ -7,9 +7,21 @@
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "lint": "bun --bun next lint",
+    "type-check": "tsc --noEmit",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "supabase:start": "bunx supabase start",
+    "supabase:stop": "bunx supabase stop",
+    "supabase:status": "bunx supabase status",
+    "supabase:reset": "bunx supabase db reset",
+    "supabase:push": "bunx supabase db push",
+    "supabase:pull": "bunx supabase db pull",
+    "supabase:types": "bunx supabase gen types typescript --local > src/types/supabase.ts",
+    "supabase:seed": "bunx supabase sql --file supabase/seed.sql",
+    "db:migrate": "bunx supabase migration up",
+    "db:seed": "bun run supabase:seed"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

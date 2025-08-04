@@ -61,8 +61,10 @@ export function DashboardNav() {
   // Use admin profile if available, fallback to auth profile
   const profile = adminProfile || authProfile;
 
-  // Debug: log admin status
-  console.log('DashboardNav - isAdmin:', isAdmin, 'adminLoading:', adminLoading, 'profile role:', profile?.role);
+  // Debug: log admin status (only in development)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('DashboardNav - isAdmin:', isAdmin, 'adminLoading:', adminLoading, 'profile role:', profile?.role);
+  }
 
   // Prevent hydration mismatch by not showing admin section until hydrated and loaded
   const shouldShowAdmin = hydrated && !adminLoading && (isAdmin || (profile?.role === 'admin' && profile?.status === 'active'));
@@ -152,7 +154,7 @@ export function DashboardNav() {
         )}
 
         {/* Debug Admin Status */}
-        {process.env.NODE_ENV === 'development' && (
+        {/* {process.env.NODE_ENV === 'development' && (
           <div className="px-3 py-2 text-xs text-gray-500 space-y-1">
             <div>Debug Info:</div>
             <div>hydrated: {String(hydrated)}</div>
@@ -165,7 +167,7 @@ export function DashboardNav() {
             <div>adminLoading: {String(adminLoading)}</div>
             <div>showAdmin: {String(shouldShowAdmin)}</div>
           </div>
-        )}
+        )} */}
       </nav>
 
       {/* User Menu */}
@@ -174,7 +176,7 @@ export function DashboardNav() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="w-full justify-start p-2">
               <Avatar className="h-8 w-8 mr-3">
-                <AvatarImage src={profile?.avatar_url} alt="Avatar" />
+                <AvatarImage src={profile?.avatar_url || undefined} alt="Avatar" />
                 <AvatarFallback>
                   {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                 </AvatarFallback>

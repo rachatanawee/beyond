@@ -14,9 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { 
   Activity, 
-  CreditCard, 
-  DollarSign, 
-  Users, 
   Calendar,
   Settings,
   BarChart3,
@@ -208,7 +205,7 @@ export default function Dashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={profile?.avatar_url} alt="Avatar" />
+                      <AvatarImage src={profile?.avatar_url || undefined} alt="Avatar" />
                       <AvatarFallback>
                         {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
                       </AvatarFallback>

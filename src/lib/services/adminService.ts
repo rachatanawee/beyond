@@ -9,10 +9,8 @@ export class AdminService {
   async isAdmin(): Promise<boolean> {
     try {
       // First try the RPC function
-      console.log('isAdmin')
       const { data, error } = await this.supabase.rpc('is_admin')
       if (!error && data !== null) {
-        console.log('isAdmin error:', error)
         return data || false
       }
 

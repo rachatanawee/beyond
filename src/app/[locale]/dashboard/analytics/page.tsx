@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, TrendingUp, Users, Activity, Clock, Target } from 'lucide-react';
+import { BarChart3, Users, Activity, Clock } from 'lucide-react';
 
 export default function AnalyticsPage() {
   return (

@@ -7,8 +7,6 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Bell, 
-  Mail, 
-  Smartphone, 
   Shield, 
   Settings, 
   Check, 

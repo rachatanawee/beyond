@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/contexts/AdminContext';
-import { useTranslations } from 'next-intl';
+// import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { ProfileUpdateData } from '@/types/profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +38,7 @@ import {
 export default function ProfilePage() {
   const { user, profile, profileLoading, updateProfile, uploadAvatar } = useAuth();
   const { isAdmin, refreshAdminStatus } = useAdmin();
-  const t = useTranslations('Profile');
+  // const t = useTranslations('Profile');
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                     {/* Avatar Section */}
                     <div className="flex items-center space-x-4">
                       <Avatar className="h-20 w-20">
-                        <AvatarImage src={profile?.avatar_url} alt="Profile picture" />
+                        <AvatarImage src={profile?.avatar_url || undefined} alt="Profile picture" />
                         <AvatarFallback className="text-lg">
                           {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
                         </AvatarFallback>
