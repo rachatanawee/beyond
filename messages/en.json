@@ -109,6 +109,17 @@
       "cannotDeleteAdmin": "Cannot delete admin users. Change role first.",
       "userDeleteFailed": "Unable to delete user: {error}",
       "internalError": "System error occurred. Please try again."
+    },
+    "updateUser": {
+      "unauthorized": "Access denied. Please log in again.",
+      "userVerificationFailed": "Unable to verify identity. Please log in again.",
+      "profileVerificationFailed": "Unable to verify user profile.",
+      "adminRequired": "Admin privileges required to update users.",
+      "userNotFound": "User not found.",
+      "missingFields": "Please provide data to update.",
+      "invalidData": "Invalid data provided.",
+      "userUpdateFailed": "Unable to update user: {error}",
+      "internalError": "System error occurred. Please try again."
     }
   },
   "Dashboard": {

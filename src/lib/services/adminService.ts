@@ -146,6 +146,41 @@ export class AdminService {
     }
   }
 
+  async updateUserProfile(userId: string, updateData: any): Promise<{ data: unknown | null; error: unknown }> {
+    try {
+      // Get current session token
+      const { data: { session } } = await this.supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        return { data: null, error: 'Not authenticated' }
+      }
+
+      // Call the API route to update user
+      const response = await fetch('/api/admin/update-user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          userId,
+          updateData
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        return { data: null, error: result.error || 'Failed to update user' }
+      }
+
+      return { data: result.data, error: null }
+    } catch (error) {
+      console.error('Update user error:', error)
+      return { data: null, error }
+    }
+  }
+
   async suspendUser(suspendData: SuspendUserData): Promise<{ error: unknown }> {
     try {
       const currentUser = (await this.supabase.auth.getUser()).data.user

@@ -109,6 +109,17 @@
       "cannotDeleteAdmin": "ไม่สามารถลบผู้ใช้ Admin ได้ กรุณาเปลี่ยนบทบาทก่อน",
       "userDeleteFailed": "ไม่สามารถลบผู้ใช้ได้: {error}",
       "internalError": "เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง"
+    },
+    "updateUser": {
+      "unauthorized": "ไม่มีสิทธิ์เข้าใช้งาน กรุณาเข้าสู่ระบบใหม่",
+      "userVerificationFailed": "ไม่สามารถยืนยันตัวตนได้ กรุณาเข้าสู่ระบบใหม่",
+      "profileVerificationFailed": "ไม่สามารถตรวจสอบข้อมูลผู้ใช้ได้",
+      "adminRequired": "คุณไม่มีสิทธิ์ Admin ในการแก้ไขผู้ใช้",
+      "userNotFound": "ไม่พบผู้ใช้ที่ต้องการแก้ไข",
+      "missingFields": "กรุณาระบุข้อมูลที่ต้องการแก้ไข",
+      "invalidData": "ข้อมูลที่ส่งมาไม่ถูกต้อง",
+      "userUpdateFailed": "ไม่สามารถแก้ไขผู้ใช้ได้: {error}",
+      "internalError": "เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง"
     }
   },
   "Dashboard": {

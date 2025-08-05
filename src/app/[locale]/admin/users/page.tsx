@@ -52,6 +52,7 @@ import {
   AlertCircle,
   CheckCircle,
   RefreshCw,
+  Edit,
 } from "lucide-react";
 
 type NewUserFormState = {
@@ -102,6 +103,9 @@ export default function UserMaintenancePage() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [createUserError, setCreateUserError] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editUserError, setEditUserError] = useState("");
+  const [editUser, setEditUser] = useState<UserWithAdmin | null>(null);
 
   // Combine profiles and create a more robust authorization check, similar to DashboardNav
   const profile = adminProfile || authProfile;
@@ -270,6 +274,37 @@ export default function UserMaintenancePage() {
         role: "user",
       });
       setCreateUserError(""); // Clear error on success
+    }
+    setIsLoading(false);
+  };
+
+  const handleEditUser = async () => {
+    if (!editUser) return;
+    
+    // Clear previous error
+    setEditUserError("");
+
+    setIsLoading(true);
+    const { error } = await adminService.updateUserProfile(editUser.user_id, {
+      full_name: editUser.full_name,
+      bio: editUser.bio,
+      website: editUser.website,
+      location: editUser.location,
+      phone: editUser.phone,
+      preferred_language: editUser.preferred_language,
+      role: editUser.role,
+      status: editUser.status
+    });
+
+    if (error) {
+      setEditUserError(getErrorMessage(error));
+    } else {
+      setMessage("User updated successfully");
+      setMessageType("success");
+      await refreshUsers();
+      setIsEditDialogOpen(false);
+      setEditUser(null);
+      setEditUserError(""); // Clear error on success
     }
     setIsLoading(false);
   };
@@ -596,6 +631,19 @@ export default function UserMaintenancePage() {
 
                       {/* Action Buttons */}
                       <div className="flex items-center space-x-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditUser(user);
+                            setIsEditDialogOpen(true);
+                            setEditUserError("");
+                          }}
+                          disabled={isLoading}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+
                         {user.status === "suspended" ? (
                           <Button
                             variant="outline"
@@ -796,6 +844,180 @@ export default function UserMaintenancePage() {
               </Button>
               <Button onClick={handleCreateUser} disabled={isLoading}>
                 Create User
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit User Dialog */}
+        <Dialog 
+          open={isEditDialogOpen} 
+          onOpenChange={(open) => {
+            setIsEditDialogOpen(open);
+            if (!open) {
+              setEditUserError("");
+              setEditUser(null);
+            }
+          }}
+        >
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit User Profile</DialogTitle>
+              <DialogDescription>
+                Update user information and settings.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              {editUserError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{editUserError}</AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-fullname">Full Name</Label>
+                  <Input
+                    id="edit-fullname"
+                    type="text"
+                    value={editUser?.full_name || ""}
+                    onChange={(e) =>
+                      setEditUser(prev => prev ? { ...prev, full_name: e.target.value } : null)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-email">Email (Read-only)</Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    value={editUser?.email || ""}
+                    disabled
+                    className="bg-muted"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-phone">Phone</Label>
+                  <Input
+                    id="edit-phone"
+                    type="tel"
+                    value={editUser?.phone || ""}
+                    onChange={(e) =>
+                      setEditUser(prev => prev ? { ...prev, phone: e.target.value } : null)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-location">Location</Label>
+                  <Input
+                    id="edit-location"
+                    type="text"
+                    value={editUser?.location || ""}
+                    onChange={(e) =>
+                      setEditUser(prev => prev ? { ...prev, location: e.target.value } : null)
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-website">Website</Label>
+                <Input
+                  id="edit-website"
+                  type="url"
+                  value={editUser?.website || ""}
+                  onChange={(e) =>
+                    setEditUser(prev => prev ? { ...prev, website: e.target.value } : null)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-bio">Bio</Label>
+                <Textarea
+                  id="edit-bio"
+                  value={editUser?.bio || ""}
+                  onChange={(e) =>
+                    setEditUser(prev => prev ? { ...prev, bio: e.target.value } : null)
+                  }
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-role">Role</Label>
+                  <Select
+                    value={editUser?.role || "user"}
+                    onValueChange={(value) => 
+                      setEditUser(prev => prev ? { ...prev, role: value as any } : null)
+                    }
+                  >
+                    <SelectTrigger id="edit-role">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="moderator">Moderator</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-status">Status</Label>
+                  <Select
+                    value={editUser?.status || "active"}
+                    onValueChange={(value) => 
+                      setEditUser(prev => prev ? { ...prev, status: value as any } : null)
+                    }
+                  >
+                    <SelectTrigger id="edit-status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="suspended">Suspended</SelectItem>
+                      <SelectItem value="banned">Banned</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-language">Language</Label>
+                  <Select
+                    value={editUser?.preferred_language || "en"}
+                    onValueChange={(value) => 
+                      setEditUser(prev => prev ? { ...prev, preferred_language: value as unknown } : null)
+                    }
+                  >
+                    <SelectTrigger id="edit-language">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="th">ไทย</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsEditDialogOpen(false);
+                  setEditUserError("");
+                  setEditUser(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleEditUser} disabled={isLoading}>
+                Update User
               </Button>
             </DialogFooter>
           </DialogContent>
