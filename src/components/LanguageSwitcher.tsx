@@ -1,8 +1,8 @@
 'use client';
 
-import {useLocale, useTranslations} from 'next-intl';
-import {useRouter, usePathname} from '@/i18n/routing';
-import {useState, useTransition} from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/routing';
+import { useState, useTransition } from 'react';
 
 export default function LanguageSwitcher() {
   const t = useTranslations('Navigation');
@@ -14,7 +14,7 @@ export default function LanguageSwitcher() {
 
   function onSelectChange(nextLocale: string) {
     startTransition(() => {
-      router.replace(pathname, {locale: nextLocale});
+      router.replace(pathname, { locale: nextLocale });
     });
     setIsOpen(false);
   }
@@ -40,17 +40,15 @@ export default function LanguageSwitcher() {
           <div className="py-1">
             <button
               onClick={() => onSelectChange('en')}
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                locale === 'en' ? 'bg-gray-100 dark:bg-gray-700 font-medium' : ''
-              }`}
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${locale === 'en' ? 'bg-gray-100 dark:bg-gray-700 font-medium' : ''
+                }`}
             >
               🇺🇸 {t('english')}
             </button>
             <button
               onClick={() => onSelectChange('th')}
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                locale === 'th' ? 'bg-gray-100 dark:bg-gray-700 font-medium' : ''
-              }`}
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${locale === 'th' ? 'bg-gray-100 dark:bg-gray-700 font-medium' : ''
+                }`}
             >
               🇹🇭 {t('thai')}
             </button>

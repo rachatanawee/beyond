@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useHydration } from '@/hooks/useHydration';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ import {
   User,
   ChevronDown,
   Languages,
+  X,
 } from 'lucide-react';
 
 const navigation = [
@@ -58,12 +59,17 @@ const navigation = [
   },
 ];
 
-export function DashboardNav() {
+interface DashboardNavProps {
+  onClose?: () => void;
+}
+
+export function DashboardNav({ onClose }: DashboardNavProps) {
   const { user, profile: authProfile, signOut } = useAuth();
   const { isAdmin, loading: adminLoading, profile: adminProfile } = useAdmin();
   const pathname = usePathname();
   const hydrated = useHydration();
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('Navigation');
   const [, startTransition] = useTransition();
 
@@ -79,6 +85,13 @@ export function DashboardNav() {
   const shouldShowAdmin = hydrated && !adminLoading && (isAdmin || (profile?.role === 'admin' && profile?.status === 'active'));
 
   const handleLocaleChange = (nextLocale: string) => {
+    console.log('Language change clicked:', nextLocale, 'current pathname:', pathname);
+    
+    // Close dropdown and sidebar on mobile
+    if (onClose) {
+      onClose();
+    }
+    
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
     });
@@ -97,11 +110,30 @@ export function DashboardNav() {
     },
   ];
 
+  const handleLinkClick = () => {
+    // Close sidebar on mobile when a link is clicked
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="flex h-screen w-64 flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen w-64 flex-col bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-r border-gray-200/50 dark:border-gray-700/50">
       {/* Logo */}
-      <div className="flex h-16 items-center px-6">
+      <div className="flex h-16 items-center justify-between px-6">
         <h1 className="text-xl font-bold">Beyond</h1>
+        {/* Close button for mobile */}
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="lg:hidden p-2"
+          >
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close sidebar</span>
+          </Button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -112,6 +144,7 @@ export function DashboardNav() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={handleLinkClick}
               className={cn(
                 'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
@@ -146,6 +179,7 @@ export function DashboardNav() {
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={handleLinkClick}
                   className={cn(
                     'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     isActive
@@ -211,13 +245,13 @@ export function DashboardNav() {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/profile">
+              <Link href="/profile" onClick={handleLinkClick}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings">
+              <Link href="/dashboard/settings" onClick={handleLinkClick}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>
@@ -229,11 +263,17 @@ export function DashboardNav() {
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
-                  <DropdownMenuItem onClick={() => handleLocaleChange('en')}>
-                    <span>🇺🇸 {t('english')}</span>
+                  <DropdownMenuItem 
+                    onClick={() => handleLocaleChange('en')}
+                    className={locale === 'en' ? 'bg-gray-100 dark:bg-gray-800' : ''}
+                  >
+                    <span>🇺🇸 {t('english')} {locale === 'en' ? '✓' : ''}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLocaleChange('th')}>
-                    <span>🇹🇭 {t('thai')}</span>
+                  <DropdownMenuItem 
+                    onClick={() => handleLocaleChange('th')}
+                    className={locale === 'th' ? 'bg-gray-100 dark:bg-gray-800' : ''}
+                  >
+                    <span>🇹🇭 {t('thai')} {locale === 'th' ? '✓' : ''}</span>
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>

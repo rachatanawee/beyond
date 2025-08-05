@@ -34,6 +34,7 @@ import {
   Lock,
   Bell
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function ProfilePage() {
   const { user, profile, profileLoading, updateProfile, uploadAvatar } = useAuth();
@@ -41,6 +42,7 @@ export default function ProfilePage() {
   // const t = useTranslations('Profile');
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('Profile');
 
   const [formData, setFormData] = useState<ProfileUpdateData>({
     full_name: profile?.full_name || '',
@@ -164,7 +166,7 @@ export default function ProfilePage() {
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight">Profile Settings</h2>
+              <h2 className="text-3xl font-bold tracking-tight"> {t('title')}</h2>
               <p className="text-muted-foreground">
                 Manage your account settings and preferences
               </p>
