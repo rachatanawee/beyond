@@ -84,7 +84,21 @@
     "userUnbanned": "User unbanned successfully",
     "userDeleted": "User deleted successfully",
     "roleUpdated": "User role updated successfully",
-    "errorPerformingAction": "Error performing action"
+    "errorPerformingAction": "Error performing action",
+    "createUser": {
+      "emailExists": "This email is already in use. Please use a different email.",
+      "profileExists": "User profile already exists in the system.",
+      "missingFields": "Please fill in email, password, and full name completely.",
+      "invalidContentType": "Invalid data format.",
+      "invalidJson": "Invalid data sent.",
+      "unauthorized": "Access denied. Please log in again.",
+      "userVerificationFailed": "Unable to verify identity. Please log in again.",
+      "profileVerificationFailed": "Unable to verify user profile.",
+      "adminRequired": "Admin privileges required to create users.",
+      "userCreationFailed": "Unable to create user: {error}",
+      "profileCreationFailed": "Unable to create user profile.",
+      "internalError": "System error occurred. Please try again."
+    }
   },
   "Dashboard": {
     "goodMorning": "Good morning",

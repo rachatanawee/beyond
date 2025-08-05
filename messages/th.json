@@ -84,7 +84,21 @@
     "userUnbanned": "ยกเลิกการแบนผู้ใช้สำเร็จ",
     "userDeleted": "ลบผู้ใช้สำเร็จ",
     "roleUpdated": "อัปเดตบทบาทผู้ใช้สำเร็จ",
-    "errorPerformingAction": "เกิดข้อผิดพลาดในการดำเนินการ"
+    "errorPerformingAction": "เกิดข้อผิดพลาดในการดำเนินการ",
+    "createUser": {
+      "emailExists": "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น",
+      "profileExists": "ข้อมูลผู้ใช้นี้มีอยู่ในระบบแล้ว",
+      "missingFields": "กรุณากรอกอีเมล รหัสผ่าน และชื่อ-นามสกุลให้ครบถ้วน",
+      "invalidContentType": "รูปแบบข้อมูลไม่ถูกต้อง",
+      "invalidJson": "ข้อมูลที่ส่งมาไม่ถูกต้อง",
+      "unauthorized": "ไม่มีสิทธิ์เข้าใช้งาน กรุณาเข้าสู่ระบบใหม่",
+      "userVerificationFailed": "ไม่สามารถยืนยันตัวตนได้ กรุณาเข้าสู่ระบบใหม่",
+      "profileVerificationFailed": "ไม่สามารถตรวจสอบข้อมูลผู้ใช้ได้",
+      "adminRequired": "คุณไม่มีสิทธิ์ Admin ในการสร้างผู้ใช้",
+      "userCreationFailed": "ไม่สามารถสร้างผู้ใช้ได้: {error}",
+      "profileCreationFailed": "ไม่สามารถสร้างข้อมูลผู้ใช้ได้",
+      "internalError": "เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง"
+    }
   },
   "Dashboard": {
     "goodMorning": "สวัสดีตอนเช้า",

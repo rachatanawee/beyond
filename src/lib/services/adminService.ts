@@ -3,13 +3,6 @@ import { UserWithAdmin, AdminLog, UserStatistics, SuspendUserData, NewUserData }
 import { ProfileService } from './profileService'
 import { UserProfile } from '@/types/profile'
 
-interface NewUserData {
-  email: string
-  password: string
-  full_name: string
-  role: 'user' | 'admin' | 'moderator'
-}
-
 export class AdminService {
   private supabase = createClient()
   private profileService = new ProfileService()
@@ -99,61 +92,35 @@ export class AdminService {
 
   async createUser(userData: NewUserData): Promise<{ data: UserProfile | null; error: unknown }> {
     try {
-      // Check if current user is admin first
-      const currentUser = (await this.supabase.auth.getUser()).data.user
-      if (!currentUser) {
+      // Get current session token
+      const { data: { session } } = await this.supabase.auth.getSession()
+
+      if (!session?.access_token) {
         return { data: null, error: 'Not authenticated' }
       }
 
-      // Check admin status
-      const isAdminUser = await this.isAdmin()
-      if (!isAdminUser) {
-        return { data: null, error: 'Admin privileges required' }
-      }
-
-      // Use Supabase Auth Admin API to create user
-      const { data: authData, error: authError } = await this.supabase.auth.admin.createUser({
-        email: userData.email,
-        password: userData.password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: userData.full_name
-        }
-      })
-
-      if (authError || !authData.user) {
-        console.error('Auth user creation error:', authError)
-        return { data: null, error: authError }
-      }
-
-      // Create profile for the new user
-      const { data: profileData, error: profileError } = await this.supabase
-        .from('profiles')
-        .insert({
-          user_id: authData.user.id,
+      // Call the API route to create user
+      const response = await fetch('/api/admin/create-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
           email: userData.email,
+          password: userData.password,
           full_name: userData.full_name,
-          role: userData.role || 'user',
-          status: 'active',
-          created_by: currentUser.id
-        })
-        .select()
-        .single()
-
-      if (profileError) {
-        console.error('Profile creation error:', profileError)
-        // If profile creation fails, clean up the auth user
-        await this.supabase.auth.admin.deleteUser(authData.user.id)
-        return { data: null, error: profileError }
-      }
-
-      // Log admin action
-      await this.logAdminAction('create_user', authData.user.id, {
-        email: userData.email,
-        role: userData.role || 'user'
+          role: userData.role || 'user'
+        }),
       })
 
-      return { data: profileData, error: null }
+      const result = await response.json()
+
+      if (!response.ok) {
+        return { data: null, error: result.error || 'Failed to create user' }
+      }
+
+      return { data: result.data, error: null }
     } catch (error) {
       console.error('Create user error:', error)
       return { data: null, error }
@@ -283,6 +250,7 @@ export class AdminService {
       await this.logAdminAction('delete_user', userId)
 
       // Delete from auth.users (this will cascade to profiles)
+      // Note: This would need another API route for proper admin deletion
       const { error } = await this.supabase.auth.admin.deleteUser(userId)
 
       return { error }

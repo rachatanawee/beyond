@@ -101,6 +101,7 @@ export default function UserMaintenancePage() {
     "success"
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [createUserError, setCreateUserError] = useState("");
 
   // Combine profiles and create a more robust authorization check, similar to DashboardNav
   const profile = adminProfile || authProfile;
@@ -239,14 +240,16 @@ export default function UserMaintenancePage() {
   };
 
   const handleCreateUser = async () => {
+    // Clear previous error
+    setCreateUserError("");
+    
     if (!newUser.email || !newUser.password || !newUser.full_name) {
-      setMessage("Please fill in all required fields");
-      setMessageType("error");
+      setCreateUserError("Please fill in all required fields");
       return;
     }
 
     setIsLoading(true);
-    const { data, error } = await adminService.createUser({
+    const { error } = await adminService.createUser({
       email: newUser.email,
       password: newUser.password,
       full_name: newUser.full_name,
@@ -254,8 +257,7 @@ export default function UserMaintenancePage() {
     });
 
     if (error) {
-      setMessage(`Failed to create user: ${getErrorMessage(error)}`);
-      setMessageType("error");
+      setCreateUserError(getErrorMessage(error));
     } else {
       setMessage("User created successfully");
       setMessageType("success");
@@ -267,6 +269,7 @@ export default function UserMaintenancePage() {
         full_name: "",
         role: "user",
       });
+      setCreateUserError(""); // Clear error on success
     }
     setIsLoading(false);
   };
@@ -394,7 +397,10 @@ export default function UserMaintenancePage() {
                 Refresh
               </Button>
               <Button
-                onClick={() => setIsCreateDialogOpen(true)}
+                onClick={() => {
+                  setIsCreateDialogOpen(true);
+                  setCreateUserError(""); // Clear previous error
+                }}
                 disabled={isLoading}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
@@ -701,7 +707,15 @@ export default function UserMaintenancePage() {
         </Dialog>
 
         {/* Create User Dialog */}
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <Dialog 
+          open={isCreateDialogOpen} 
+          onOpenChange={(open) => {
+            setIsCreateDialogOpen(open);
+            if (!open) {
+              setCreateUserError(""); // Clear error when closing
+            }
+          }}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New User</DialogTitle>
@@ -711,6 +725,12 @@ export default function UserMaintenancePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
+              {createUserError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{createUserError}</AlertDescription>
+                </Alert>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="new-email">Email</Label>
                 <Input
@@ -767,7 +787,10 @@ export default function UserMaintenancePage() {
             <DialogFooter>
               <Button
                 variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
+                onClick={() => {
+                  setIsCreateDialogOpen(false);
+                  setCreateUserError(""); // Clear error when canceling
+                }}
               >
                 Cancel
               </Button>
