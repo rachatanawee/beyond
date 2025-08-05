@@ -246,15 +246,41 @@ export class AdminService {
 
   async deleteUser(userId: string): Promise<{ error: unknown }> {
     try {
-      // Log before deletion
-      await this.logAdminAction('delete_user', userId)
+      // Get current session token
+      const { data: { session } } = await this.supabase.auth.getSession()
 
-      // Delete from auth.users (this will cascade to profiles)
-      // Note: This would need another API route for proper admin deletion
-      const { error } = await this.supabase.auth.admin.deleteUser(userId)
+      if (!session?.access_token) {
+        return { error: 'Not authenticated' }
+      }
 
-      return { error }
+      // Try hard delete first, fallback to soft delete if service role key issues
+      let response = await fetch(`/api/admin/delete-user?userId=${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      })
+
+      // If hard delete fails with 403/500, try profile delete
+      if (!response.ok && (response.status === 403 || response.status === 500)) {
+        console.log('Hard delete failed, trying profile delete...')
+        response = await fetch(`/api/admin/delete-user-profile?userId=${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        })
+      }
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        return { error: result.error || 'Failed to delete user' }
+      }
+
+      return { error: null }
     } catch (error) {
+      console.error('Delete user error:', error)
       return { error }
     }
   }

@@ -98,6 +98,17 @@
       "userCreationFailed": "ไม่สามารถสร้างผู้ใช้ได้: {error}",
       "profileCreationFailed": "ไม่สามารถสร้างข้อมูลผู้ใช้ได้",
       "internalError": "เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง"
+    },
+    "deleteUser": {
+      "unauthorized": "ไม่มีสิทธิ์เข้าใช้งาน กรุณาเข้าสู่ระบบใหม่",
+      "userVerificationFailed": "ไม่สามารถยืนยันตัวตนได้ กรุณาเข้าสู่ระบบใหม่",
+      "profileVerificationFailed": "ไม่สามารถตรวจสอบข้อมูลผู้ใช้ได้",
+      "adminRequired": "คุณไม่มีสิทธิ์ Admin ในการลบผู้ใช้",
+      "userNotFound": "ไม่พบผู้ใช้ที่ต้องการลบ",
+      "cannotDeleteSelf": "คุณไม่สามารถลบบัญชีของตัวเองได้",
+      "cannotDeleteAdmin": "ไม่สามารถลบผู้ใช้ Admin ได้ กรุณาเปลี่ยนบทบาทก่อน",
+      "userDeleteFailed": "ไม่สามารถลบผู้ใช้ได้: {error}",
+      "internalError": "เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง"
     }
   },
   "Dashboard": {

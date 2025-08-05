@@ -98,6 +98,17 @@
       "userCreationFailed": "Unable to create user: {error}",
       "profileCreationFailed": "Unable to create user profile.",
       "internalError": "System error occurred. Please try again."
+    },
+    "deleteUser": {
+      "unauthorized": "Access denied. Please log in again.",
+      "userVerificationFailed": "Unable to verify identity. Please log in again.",
+      "profileVerificationFailed": "Unable to verify user profile.",
+      "adminRequired": "Admin privileges required to delete users.",
+      "userNotFound": "User not found.",
+      "cannotDeleteSelf": "You cannot delete your own account.",
+      "cannotDeleteAdmin": "Cannot delete admin users. Change role first.",
+      "userDeleteFailed": "Unable to delete user: {error}",
+      "internalError": "System error occurred. Please try again."
     }
   },
   "Dashboard": {
