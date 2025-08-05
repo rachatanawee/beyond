@@ -1,274 +1,225 @@
-# Beyond - Multi-language Next.js Application
+# Beyond - Modern Web Application
 
-A modern Next.js application with multi-language support (Thai/English), authentication, admin dashboard, and comprehensive user management system.
+A comprehensive web application built with Next.js 15, TypeScript, and Supabase, featuring advanced user management, internationalization, and admin capabilities.
 
-## Features
+## 🚀 Features
 
-- 🌐 **Multi-language Support** - Thai and English with next-intl
-- 🔐 **Authentication** - Email/password and OAuth (Google, GitHub) with Supabase
-- 👤 **User Profiles** - Complete profile management with avatar upload
-- 🛡️ **Admin Dashboard** - Role-based access control and user management
-- 📱 **Responsive Design** - Modern UI with shadcn/ui components
-- 🧪 **Testing Suite** - Comprehensive tests with Playwright
-- 🗄️ **Database** - PostgreSQL with Supabase and RLS policies
+### Core Features
+- **🔐 Authentication & Authorization** - Secure user authentication with role-based access control
+- **👥 User Management** - Complete CRUD operations for user profiles
+- **🌍 Internationalization** - Multi-language support (English/Thai)
+- **📱 Responsive Design** - Mobile-first responsive UI
+- **🎨 Modern UI** - Built with Tailwind CSS and shadcn/ui components
 
-## Tech Stack
+### Admin Features
+- **👨‍💼 Admin Dashboard** - Comprehensive admin panel
+- **📊 User Analytics** - User statistics and insights
+- **🔧 User Management** - Create, edit, suspend, ban, and delete users
+- **📋 Activity Logging** - Complete audit trail of admin actions
+- **📤 Data Export** - Export user data in CSV/JSON formats
 
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Internationalization**: next-intl
-- **Testing**: Playwright
-- **Package Manager**: Bun
+### Technical Features
+- **⚡ Performance** - Optimized build with Next.js 15 and Bun
+- **🛡️ Type Safety** - Full TypeScript implementation
+- **🔒 Security** - Row-level security and input validation
+- **📈 Scalability** - Designed for growth and expansion
 
-## Getting Started
+## 🛠️ Technology Stack
 
-### Prerequisites
+- **Frontend:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** Supabase (PostgreSQL, Auth, Storage)
+- **Build Tool:** Bun
+- **Testing:** Playwright
+- **Deployment:** Vercel (recommended)
 
-- [Bun](https://bun.sh/) installed
-- [Docker](https://docker.com/) for local Supabase development
-- [Supabase CLI](https://supabase.com/docs/guides/cli)
+## 📋 Prerequisites
 
-### Installation
+- **Node.js** 18+ or **Bun** 1.0+
+- **Supabase** account and project
+- **Git** for version control
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd beyond
-   ```
+## 🚀 Quick Start
 
-2. **Install dependencies**
-   ```bash
-   bun install
-   ```
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd beyond
+```
 
-3. **Set up Supabase locally**
-   ```bash
-   # Start Supabase services
-   bunx supabase start
-   
-   # Run database migrations
-   bunx supabase db reset
-   ```
+### 2. Install Dependencies
+```bash
+bun install
+```
 
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Update `.env.local` with your Supabase credentials:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   ```
+### 3. Environment Setup
+Create `.env.local` file:
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-5. **Seed the database (optional)**
-   ```bash
-   # Create an admin user after signing up through the app
-   bunx supabase sql --file supabase/seed.sql
-   ```
-   
-   Or manually update a user to admin:
-   ```sql
-   UPDATE public.profiles 
-   SET role = 'admin', status = 'active' 
-   WHERE email = 'your-email@example.com';
-   ```
+### 4. Database Setup
+Run the migration file in your Supabase SQL editor:
+```bash
+# Execute: supabase/migrations/001_create_profiles_table.sql
+```
 
-6. **Start the development server**
-   ```bash
-   bun dev
-   ```
+### 5. Start Development Server
+```bash
+bun dev
+```
 
-   Open [http://localhost:3000](http://localhost:3000) to view the application.
+Visit `http://localhost:3000` to see the application.
 
-## Database Schema
+## 📁 Project Structure
 
-The application uses the following main tables:
+```
+beyond/
+├── docs/                       # Documentation
+│   ├── project-architecture-spec.md
+│   └── user-management-spec.md
+├── messages/                   # Internationalization
+│   ├── en.json
+│   └── th.json
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── [locale]/          # Internationalized routes
+│   │   └── api/               # API routes
+│   ├── components/            # Reusable components
+│   ├── contexts/             # React contexts
+│   ├── lib/                  # Utilities and services
+│   └── types/                # TypeScript definitions
+├── supabase/                 # Database configuration
+└── tests/                    # Test files
+```
 
-- **profiles** - User profile information with roles and status
-- **admin_logs** - Audit trail for admin actions
-- **Storage buckets** - Avatar image storage
-
-### User Roles
-
-- **user** - Regular user with basic access
-- **admin** - Full administrative access
-- **moderator** - Limited administrative access
-
-### User Status
-
-- **active** - Normal active user
-- **suspended** - Temporarily suspended user
-- **banned** - Permanently banned user
-- **pending** - Pending activation
-
-## Available Scripts
+## 🔧 Available Scripts
 
 ```bash
 # Development
-bun dev                    # Start development server
-bun build                  # Build for production
-bun start                  # Start production server
-bun lint                   # Run ESLint
-bun type-check            # Run TypeScript checks
+bun dev                 # Start development server
+bun build              # Build for production
+bun start              # Start production server
 
 # Testing
-bun test                   # Run Playwright tests
-bun test:ui               # Run tests with UI
-bun test:debug            # Debug tests
+bun test               # Run tests
+bun test:e2e           # Run E2E tests
 
-# Supabase
-bunx supabase start       # Start local Supabase
-bunx supabase stop        # Stop local Supabase
-bunx supabase status      # Check Supabase status
-bunx supabase db reset    # Reset database with migrations
-bunx supabase db push     # Push migrations to remote
-bunx supabase gen types   # Generate TypeScript types
+# Database
+node scripts/seed-cloud.js           # Seed database
+node scripts/cleanup-orphaned-users.js  # Clean orphaned users
 ```
 
-## Project Structure
+## 🌍 Internationalization
 
-```
-src/
-├── app/                  # Next.js App Router
-│   ├── [locale]/        # Internationalized routes
-│   │   ├── admin/       # Admin dashboard
-│   │   ├── dashboard/   # User dashboard
-│   │   ├── login/       # Authentication
-│   │   └── profile/     # User profile
-├── components/          # Reusable UI components
-│   └── ui/             # shadcn/ui components
-├── contexts/           # React contexts
-│   ├── AuthContext.tsx # Authentication state
-│   └── AdminContext.tsx # Admin state
-├── lib/                # Utilities and configurations
-│   ├── services/       # API services
-│   └── supabase/       # Supabase client
-├── types/              # TypeScript type definitions
-└── hooks/              # Custom React hooks
+The application supports multiple languages:
 
-supabase/
-├── migrations/         # Database migrations
-├── config.toml        # Supabase configuration
-└── seed.sql           # Database seed data
+- **English (en)** - Default language
+- **Thai (th)** - Full translation support
 
-messages/              # Internationalization files
-├── en.json           # English translations
-└── th.json           # Thai translations
+Language switching is available in the navigation menu.
 
-tests/                # Playwright tests
-├── auth.spec.ts      # Authentication tests
-├── admin.spec.ts     # Admin functionality tests
-└── utils/            # Test utilities
-```
+## 👨‍💼 Admin Features
 
-## Internationalization
+### User Management
+- **Create Users** - Add new users with roles and permissions
+- **Edit Profiles** - Update user information and settings
+- **Role Management** - Assign user, moderator, or admin roles
+- **Status Control** - Activate, suspend, ban, or delete users
+- **Bulk Operations** - Perform actions on multiple users
 
-The app supports Thai and English languages:
+### Analytics & Reporting
+- **User Statistics** - Growth metrics and user counts
+- **Activity Logs** - Complete audit trail of admin actions
+- **Data Export** - Export user data in multiple formats
 
-- Routes are prefixed with locale (`/en/dashboard`, `/th/dashboard`)
-- Translations are stored in `messages/` directory
-- Language switcher available in navigation
-- Automatic locale detection based on browser preferences
+## 🔒 Security Features
 
-## Authentication
+- **Authentication** - Secure JWT-based authentication
+- **Authorization** - Role-based access control (RBAC)
+- **Input Validation** - Server-side validation and sanitization
+- **SQL Injection Prevention** - Parameterized queries
+- **XSS Protection** - Content sanitization
+- **Audit Logging** - Complete action tracking
 
-### Supported Methods
+## 📊 Database Schema
 
-- Email/Password authentication
-- Google OAuth
-- GitHub OAuth
+### Core Tables
+- **profiles** - User profile information
+- **admin_logs** - Admin action audit trail
 
-### User Flow
+### Key Features
+- **Row Level Security (RLS)** - Database-level access control
+- **Automatic Triggers** - Profile creation and timestamp updates
+- **Foreign Key Constraints** - Data integrity enforcement
 
-1. Sign up creates a user in `auth.users`
-2. Profile is automatically created in `public.profiles`
-3. Default role is `user` with `active` status
-4. Admin can manage user roles and status
+## 🚀 Deployment
 
-## Admin Features
+### Vercel (Recommended)
+1. Connect your Git repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
-- **User Maintenance** - Comprehensive user management interface
-  - Search and filter users by name, email, status, or role
-  - Update user roles (user, moderator, admin)
-  - Suspend users with reason and expiration date
-  - Ban/unban users
-  - Delete user accounts
-  - Export user data (CSV/JSON)
-  - View user details (login history, profile info)
-- **Role Management** - Assign admin/moderator roles
-- **Audit Logs** - Track all admin actions
-- **User Statistics** - Dashboard with user metrics
-- **Bulk Operations** - Export user data
-
-## Testing
-
-The project includes comprehensive tests:
-
+### Manual Deployment
 ```bash
-# Run all tests
-bun test
-
-# Run specific test file
-bun test tests/auth.spec.ts
-
-# Run tests with UI
-bun test:ui
-
-# Debug tests
-bun test:debug
+bun build
+bun start
 ```
 
-Test coverage includes:
+## 🧪 Testing
+
+### E2E Testing with Playwright
+```bash
+bun test:e2e
+```
+
+### Test Coverage
 - Authentication flows
-- Admin functionality
+- User management operations
+- Internationalization
 - Responsive design
 - Accessibility compliance
-- Language switching
-- Navigation
 
-## Deployment
+## 📚 Documentation
 
-### Deploy to Vercel
+- **[Project Architecture](docs/project-architecture-spec.md)** - Technical architecture overview
+- **[User Management](docs/user-management-spec.md)** - User management system specification
 
-1. **Connect to Supabase Cloud**
-   ```bash
-   bunx supabase link --project-ref your-project-ref
-   bunx supabase db push
-   ```
-
-2. **Deploy to Vercel**
-   ```bash
-   vercel --prod
-   ```
-
-3. **Set environment variables in Vercel**
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-
-### Other Platforms
-
-The app can be deployed to any platform that supports Next.js:
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Run tests and linting
-6. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📝 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Check the [documentation](docs/)
+- Open an [issue](issues)
+- Contact the development team
+
+## 🎯 Roadmap
+
+### Upcoming Features
+- **Password Reset** - Admin-initiated password resets
+- **Bulk Operations** - Enhanced multi-user actions
+- **Real-time Notifications** - Live updates and alerts
+- **Advanced Analytics** - Detailed user insights
+- **Mobile App** - React Native companion
+
+### Long-term Goals
+- **Microservices Architecture** - Service decomposition
+- **AI Integration** - Intelligent user insights
+- **Multi-tenancy** - Organization-based isolation
+- **Advanced Permissions** - Granular access control
+
+---
+
+**Built with ❤️ using Next.js, TypeScript, and Supabase**

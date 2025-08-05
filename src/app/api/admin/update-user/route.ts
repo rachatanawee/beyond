@@ -162,7 +162,7 @@ export async function PUT(request: NextRequest) {
       'date_of_birth', 'preferred_language', 'role', 'status'
     ]
     
-    const sanitizedData: any = {}
+    const sanitizedData: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(updateData)) {
       if (allowedFields.includes(key)) {
         sanitizedData[key] = value

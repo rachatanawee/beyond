@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import { UserWithAdmin, AdminLog, UserStatistics, SuspendUserData, NewUserData } from '@/types/admin'
+import { UserWithAdmin, AdminLog, UserStatistics, SuspendUserData, NewUserData, UpdateUserData } from '@/types/admin'
 import { ProfileService } from './profileService'
 import { UserProfile } from '@/types/profile'
 
@@ -146,7 +146,7 @@ export class AdminService {
     }
   }
 
-  async updateUserProfile(userId: string, updateData: any): Promise<{ data: unknown | null; error: unknown }> {
+  async updateUserProfile(userId: string, updateData: UpdateUserData): Promise<{ data: UserWithAdmin | null; error: unknown }> {
     try {
       // Get current session token
       const { data: { session } } = await this.supabase.auth.getSession()

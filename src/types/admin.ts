@@ -56,3 +56,15 @@ export interface NewUserData {
   full_name: string
   role?: 'user' | 'admin' | 'moderator'
 }
+
+export interface UpdateUserData {
+  full_name?: string
+  bio?: string
+  website?: string
+  location?: string
+  phone?: string
+  date_of_birth?: string
+  preferred_language?: 'en' | 'th'
+  role?: 'user' | 'admin' | 'moderator'
+  status?: 'active' | 'suspended' | 'banned' | 'pending'
+}

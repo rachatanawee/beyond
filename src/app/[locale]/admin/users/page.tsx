@@ -286,11 +286,11 @@ export default function UserMaintenancePage() {
 
     setIsLoading(true);
     const { error } = await adminService.updateUserProfile(editUser.user_id, {
-      full_name: editUser.full_name,
-      bio: editUser.bio,
-      website: editUser.website,
-      location: editUser.location,
-      phone: editUser.phone,
+      full_name: editUser.full_name || undefined,
+      bio: editUser.bio || undefined,
+      website: editUser.website || undefined,
+      location: editUser.location || undefined,
+      phone: editUser.phone || undefined,
       preferred_language: editUser.preferred_language,
       role: editUser.role,
       status: editUser.status
@@ -954,7 +954,7 @@ export default function UserMaintenancePage() {
                   <Select
                     value={editUser?.role || "user"}
                     onValueChange={(value) => 
-                      setEditUser(prev => prev ? { ...prev, role: value as any } : null)
+                      setEditUser(prev => prev ? { ...prev, role: value as 'user' | 'admin' | 'moderator' } : null)
                     }
                   >
                     <SelectTrigger id="edit-role">
@@ -972,7 +972,7 @@ export default function UserMaintenancePage() {
                   <Select
                     value={editUser?.status || "active"}
                     onValueChange={(value) => 
-                      setEditUser(prev => prev ? { ...prev, status: value as any } : null)
+                      setEditUser(prev => prev ? { ...prev, status: value as 'active' | 'suspended' | 'banned' | 'pending' } : null)
                     }
                   >
                     <SelectTrigger id="edit-status">
@@ -991,7 +991,7 @@ export default function UserMaintenancePage() {
                   <Select
                     value={editUser?.preferred_language || "en"}
                     onValueChange={(value) => 
-                      setEditUser(prev => prev ? { ...prev, preferred_language: value as unknown } : null)
+                      setEditUser(prev => prev ? { ...prev, preferred_language: value as 'en' | 'th' } : null)
                     }
                   >
                     <SelectTrigger id="edit-language">
