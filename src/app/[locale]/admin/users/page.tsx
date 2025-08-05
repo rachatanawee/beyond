@@ -106,8 +106,20 @@ export default function UserMaintenancePage() {
   const profile = adminProfile || authProfile;
   const isAuthorized = isAdmin || (profile?.role === 'admin' && profile?.status === 'active');
 
+  // Debug logging
+  console.log('UserMaintenance Debug:', {
+    authLoading,
+    adminLoading,
+    loading,
+    isAdmin,
+    profileRole: profile?.role,
+    profileStatus: profile?.status,
+    isAuthorized
+  });
+
   useEffect(() => {
     if (!loading && !isAuthorized) {
+      console.log('UserMaintenance - Not authorized, redirecting to home');
       router.push("/");
     }
   }, [isAuthorized, loading, router]);
@@ -123,11 +135,22 @@ export default function UserMaintenancePage() {
     );
   }
 
-  // After loading, if the user is not an admin, render nothing.
-  // The useEffect below will handle redirecting them to the home page.
-  // This prevents non-admins from seeing the page content even for a moment.
+  // After loading, if the user is not an admin, show access denied
   if (!isAuthorized) {
-    return null;
+    return (
+      <div className="flex min-h-screen">
+        <DashboardNav />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+            <p className="text-muted-foreground">You need admin privileges to access this page.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Debug: isAdmin={String(isAdmin)}, role={profile?.role}, status={profile?.status}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const filteredUsers = users.filter((user) => {
@@ -141,27 +164,7 @@ export default function UserMaintenancePage() {
     return matchesSearch && matchesStatus && matchesRole;
   });
 
-  const handleCreateUser = async () => {
-    if (!newUser.email || !newUser.password || !newUser.full_name) return;
 
-    setIsLoading(true);
-    // This assumes a `createUser` method exists in your adminService
-    // that handles both auth user and profile creation on the backend.
-    const { error } = await adminService.createUser(newUser);
-
-    if (error) {
-      setMessage(`Failed to create user: ${getErrorMessage(error)}`);
-      setMessageType("error");
-    } else {
-      setMessage("User created successfully");
-      setMessageType("success");
-      await refreshUsers();
-      setIsCreateDialogOpen(false);
-      // Reset form
-      setNewUser({ email: "", password: "", full_name: "", role: "user" });
-    }
-    setIsLoading(false);
-  };
 
   const handleUpdateRole = async (
     userId: string,
@@ -231,6 +234,39 @@ export default function UserMaintenancePage() {
       setMessage("User banned successfully");
       setMessageType("success");
       await refreshUsers();
+    }
+    setIsLoading(false);
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password || !newUser.full_name) {
+      setMessage("Please fill in all required fields");
+      setMessageType("error");
+      return;
+    }
+
+    setIsLoading(true);
+    const { data, error } = await adminService.createUser({
+      email: newUser.email,
+      password: newUser.password,
+      full_name: newUser.full_name,
+      role: newUser.role,
+    });
+
+    if (error) {
+      setMessage(`Failed to create user: ${getErrorMessage(error)}`);
+      setMessageType("error");
+    } else {
+      setMessage("User created successfully");
+      setMessageType("success");
+      await refreshUsers();
+      setIsCreateDialogOpen(false);
+      setNewUser({
+        email: "",
+        password: "",
+        full_name: "",
+        role: "user",
+      });
     }
     setIsLoading(false);
   };

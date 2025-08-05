@@ -65,8 +65,13 @@ CREATE POLICY "Users can update own profile or admins can update all" ON public.
         auth.uid() = user_id OR public.is_admin_user()
     );
 
-CREATE POLICY "Users can insert their own profile" ON public.profiles
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own profile or admins can insert any" ON public.profiles
+    FOR INSERT WITH CHECK (
+        auth.uid() = user_id OR public.is_admin_user()
+    );
+
+CREATE POLICY "Admins can delete any profile" ON public.profiles
+    FOR DELETE USING (public.is_admin_user());
 
 -- Function to log admin actions
 CREATE OR REPLACE FUNCTION public.log_admin_action(

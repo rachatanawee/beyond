@@ -49,3 +49,10 @@ export interface SuspendUserData {
   suspendUntil: string
   reason: string
 }
+
+export interface NewUserData {
+  email: string
+  password: string
+  full_name: string
+  role?: 'user' | 'admin' | 'moderator'
+}

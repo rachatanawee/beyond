@@ -21,7 +21,8 @@
     "supabase:types": "bunx supabase gen types typescript --local > src/types/supabase.ts",
     "supabase:seed": "bunx supabase sql --file supabase/seed.sql",
     "db:migrate": "bunx supabase migration up",
-    "db:seed": "bun run supabase:seed"
+    "db:seed": "bun run supabase:seed",
+    "seed-cloud": "bun run scripts/seed-cloud.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
