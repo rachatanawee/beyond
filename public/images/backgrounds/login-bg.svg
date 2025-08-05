@@ -1,0 +1,41 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#gradient1)"/>
+  
+  <!-- Floating shapes -->
+  <circle cx="200" cy="200" r="100" fill="url(#gradient2)" opacity="0.3">
+    <animateTransform attributeName="transform" type="translate" values="0,0; 50,30; 0,0" dur="20s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="1600" cy="300" r="150" fill="url(#gradient2)" opacity="0.2">
+    <animateTransform attributeName="transform" type="translate" values="0,0; -30,50; 0,0" dur="25s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="300" cy="800" r="80" fill="url(#gradient2)" opacity="0.4">
+    <animateTransform attributeName="transform" type="translate" values="0,0; 40,-20; 0,0" dur="18s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="1400" cy="900" r="120" fill="url(#gradient2)" opacity="0.25">
+    <animateTransform attributeName="transform" type="translate" values="0,0; -20,-40; 0,0" dur="22s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Abstract shapes -->
+  <path d="M100,500 Q300,400 500,500 T900,500" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none">
+    <animate attributeName="d" values="M100,500 Q300,400 500,500 T900,500; M100,520 Q300,420 500,520 T900,520; M100,500 Q300,400 500,500 T900,500" dur="15s" repeatCount="indefinite"/>
+  </path>
+  
+  <path d="M1000,300 Q1200,200 1400,300 T1800,300" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none">
+    <animate attributeName="d" values="M1000,300 Q1200,200 1400,300 T1800,300; M1000,280 Q1200,180 1400,280 T1800,280; M1000,300 Q1200,200 1400,300 T1800,300" dur="18s" repeatCount="indefinite"/>
+  </path>
+</svg>
