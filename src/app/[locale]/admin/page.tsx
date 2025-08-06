@@ -4,6 +4,7 @@ import { useAdmin } from '@/contexts/AdminContext';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { useEffect } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
   const { isAdmin, loading, users, totalUsers } = useAdmin();
   const t = useTranslations('Admin');
   const router = useRouter();
+  usePageTitle('Admin Dashboard');
 
   useEffect(() => {
     if (!loading && !isAdmin) {

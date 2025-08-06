@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useRouter } from "@/i18n/routing";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { UserWithAdmin } from "@/types/admin";
 import {
   Card,
@@ -79,6 +80,7 @@ export default function UserMaintenancePage() {
   const { profile: authProfile, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading, profile: adminProfile, users, adminService, refreshUsers } = useAdmin();
   const router = useRouter();
+  usePageTitle('User Maintenance');
   // Wait for both auth and admin contexts to finish loading
   const loading = authLoading || adminLoading;
 
@@ -128,6 +130,8 @@ export default function UserMaintenancePage() {
       router.push("/");
     }
   }, [isAuthorized, loading, router]);
+
+
 
   if (loading) {
     return (

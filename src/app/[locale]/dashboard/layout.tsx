@@ -4,13 +4,15 @@ import { DashboardNav } from '@/components/dashboard-nav';
 import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageTitleProvider, usePageTitleContext } from '@/contexts/PageTitleContext';
 
-export default function DashboardLayout({
+function DashboardLayoutContent({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false); // Default to closed, will be managed by useEffect
+  const { title } = usePageTitleContext();
 
   // Set default sidebar state based on screen size
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function DashboardLayout({
       <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'}`}>
         {/* Header with hamburger - always visible */}
         <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
@@ -62,8 +64,9 @@ export default function DashboardLayout({
               <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle sidebar</span>
             </Button>
-            <h1 className="text-lg font-semibold lg:hidden">Beyond</h1>
-            <div className="w-10 lg:hidden" /> {/* Spacer for centering on mobile */}
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {title}
+            </h1>
           </div>
         </header>
 
@@ -73,5 +76,19 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <PageTitleProvider>
+      <DashboardLayoutContent>
+        {children}
+      </DashboardLayoutContent>
+    </PageTitleProvider>
   );
 }
