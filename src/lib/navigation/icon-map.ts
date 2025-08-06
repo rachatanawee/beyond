@@ -14,7 +14,16 @@ import {
   Calendar,
   Clock,
   TrendingUp,
-  Zap
+  Zap,
+  // เพิ่ม icons ใหม่ที่นี่
+  CreditCard,
+  Package,
+  Truck,
+  ShoppingCart,
+  DollarSign,
+  PieChart,
+  BarChart,
+  LineChart
 } from 'lucide-react';
 
 // Icon mapping for client-side resolution
@@ -35,6 +44,15 @@ export const iconMap = {
   Clock,
   TrendingUp,
   Zap,
+  // เพิ่ม icons ใหม่ที่นี่
+  CreditCard,
+  Package,
+  Truck,
+  ShoppingCart,
+  DollarSign,
+  PieChart,
+  BarChart,
+  LineChart,
 } as const;
 
 export type IconName = keyof typeof iconMap;

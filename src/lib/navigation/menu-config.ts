@@ -69,6 +69,13 @@ export const menuConfig: MenuItem[] = [
         iconName: 'BarChart3',
         description: 'Production-ready data table',
       },
+      {
+        id: 'export-table',
+        name: 'Export Table',
+        href: '/dashboard/export-table-demo',
+        iconName: 'FileText',
+        description: 'Table with export functionality',
+      },
     ],
   },
   
@@ -111,6 +118,15 @@ export const menuConfig: MenuItem[] = [
         description: 'Manage user accounts',
         requiredRoles: ['admin'],
         requiredPermissions: ['user.read'],
+      },
+      {
+        id: 'permission-management',
+        name: 'Permission Management',
+        href: '/admin/permissions',
+        iconName: 'Lock',
+        description: 'Manage user permissions and roles',
+        requiredRoles: ['admin'],
+        requiredPermissions: ['admin.access'],
       },
       {
         id: 'system-settings',
@@ -181,6 +197,42 @@ export const menuConfig: MenuItem[] = [
         href: '/dashboard/settings',
         iconName: 'Settings',
         description: 'App preferences and settings',
+      },
+    ],
+  },
+
+  // E-commerce Section - Available to moderators and admins
+  {
+    id: 'ecommerce',
+    name: 'E-commerce',
+    href: '#',
+    iconName: 'ShoppingCart',
+    description: 'E-commerce management',
+    requiredRoles: ['admin', 'moderator'],
+    children: [
+      {
+        id: 'products',
+        name: 'Products',
+        href: '/ecommerce/products',
+        iconName: 'Package',
+        description: 'Manage products',
+        requiredRoles: ['admin', 'moderator'],
+      },
+      {
+        id: 'orders',
+        name: 'Orders',
+        href: '/ecommerce/orders',
+        iconName: 'Truck',
+        description: 'Manage orders',
+        requiredRoles: ['admin', 'moderator'],
+      },
+      {
+        id: 'payments',
+        name: 'Payments',
+        href: '/ecommerce/payments',
+        iconName: 'CreditCard',
+        description: 'Payment management',
+        requiredRoles: ['admin'],
       },
     ],
   },
