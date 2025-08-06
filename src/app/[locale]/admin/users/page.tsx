@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { DashboardNav } from "@/components/dashboard-nav";
+
 import {
   Users,
   Search,
@@ -131,11 +131,8 @@ export default function UserMaintenancePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <DashboardNav />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-lg">Loading...</div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }
@@ -143,16 +140,13 @@ export default function UserMaintenancePage() {
   // After loading, if the user is not an admin, show access denied
   if (!isAuthorized) {
     return (
-      <div className="flex min-h-screen">
-        <DashboardNav />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">You need admin privileges to access this page.</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Debug: isAdmin={String(isAdmin)}, role={profile?.role}, status={profile?.status}
-            </p>
-          </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">You need admin privileges to access this page.</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Debug: isAdmin={String(isAdmin)}, role={profile?.role}, status={profile?.status}
+          </p>
         </div>
       </div>
     );
@@ -246,7 +240,7 @@ export default function UserMaintenancePage() {
   const handleCreateUser = async () => {
     // Clear previous error
     setCreateUserError("");
-    
+
     if (!newUser.email || !newUser.password || !newUser.full_name) {
       setCreateUserError("Please fill in all required fields");
       return;
@@ -280,7 +274,7 @@ export default function UserMaintenancePage() {
 
   const handleEditUser = async () => {
     if (!editUser) return;
-    
+
     // Clear previous error
     setEditUserError("");
 
@@ -396,432 +390,566 @@ export default function UserMaintenancePage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <DashboardNav />
-      <main className="flex-1 overflow-y-auto">
-        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight">
-                User Maintenance
-              </h2>
-              <p className="text-muted-foreground">
-                Manage user accounts, roles, and permissions
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => exportUsers("csv")}
-                disabled={isLoading}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export CSV
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => exportUsers("json")}
-                disabled={isLoading}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export JSON
-              </Button>
-              <Button onClick={refreshUsers} disabled={isLoading}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsCreateDialogOpen(true);
-                  setCreateUserError(""); // Clear previous error
-                }}
-                disabled={isLoading}
-              >
-                <UserPlus className="mr-2 h-4 w-4" />
-                Create User
-              </Button>
-            </div>
+    <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              User Maintenance
+            </h2>
+            <p className="text-muted-foreground">
+              Manage user accounts, roles, and permissions
+            </p>
           </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => exportUsers("csv")}
+              disabled={isLoading}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => exportUsers("json")}
+              disabled={isLoading}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export JSON
+            </Button>
+            <Button onClick={refreshUsers} disabled={isLoading}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+            <Button
+              onClick={() => {
+                setIsCreateDialogOpen(true);
+                setCreateUserError(""); // Clear previous error
+              }}
+              disabled={isLoading}
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Create User
+            </Button>
+          </div>
+        </div>
 
-          {/* Alert Messages */}
-          {message && (
-            <Alert
+        {/* Alert Messages */}
+        {message && (
+          <Alert
+            className={
+              messageType === "error"
+                ? "border-red-200 bg-red-50"
+                : "border-green-200 bg-green-50"
+            }
+          >
+            {messageType === "error" ? (
+              <AlertCircle className="h-4 w-4 text-red-600" />
+            ) : (
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            )}
+            <AlertDescription
               className={
-                messageType === "error"
-                  ? "border-red-200 bg-red-50"
-                  : "border-green-200 bg-green-50"
+                messageType === "error" ? "text-red-800" : "text-green-800"
               }
             >
-              {messageType === "error" ? (
-                <AlertCircle className="h-4 w-4 text-red-600" />
-              ) : (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              )}
-              <AlertDescription
-                className={
-                  messageType === "error" ? "text-red-800" : "text-green-800"
-                }
-              >
-                {message}
-              </AlertDescription>
-            </Alert>
-          )}
+              {message}
+            </AlertDescription>
+          </Alert>
+        )}
 
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Filters</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-4">
-                <div className="space-y-2">
-                  <Label htmlFor="search">Search Users</Label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="search"
-                      placeholder="Search by name or email..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Status Filter</Label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                      <SelectItem value="banned">Banned</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Role Filter</Label>
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Roles" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="moderator">Moderator</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Results</Label>
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <Users className="h-4 w-4" />
-                    <span>{filteredUsers.length} users found</span>
-                  </div>
+        {/* Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="space-y-2">
+                <Label htmlFor="search">Search Users</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="search"
+                    placeholder="Search by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Users List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Users ({filteredUsers.length})</CardTitle>
-              <CardDescription>
-                Manage user accounts and permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage
-                          src={user.avatar_url || undefined}
-                          alt="Avatar"
-                        />
-                        <AvatarFallback>
-                          {user.full_name?.charAt(0) || user.email.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+              <div className="space-y-2">
+                <Label>Status Filter</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                    <SelectItem value="banned">Banned</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-medium">
-                            {user.full_name || "No name"}
-                          </h4>
-                          {getRoleBadge(user.role)}
-                          {getStatusBadge(user.status)}
+              <div className="space-y-2">
+                <Label>Role Filter</Label>
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Roles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="moderator">Moderator</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Results</Label>
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <Users className="h-4 w-4" />
+                  <span>{filteredUsers.length} users found</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Users List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Users ({filteredUsers.length})</CardTitle>
+            <CardDescription>
+              Manage user accounts and permissions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage
+                        src={user.avatar_url || undefined}
+                        alt="Avatar"
+                      />
+                      <AvatarFallback>
+                        {user.full_name?.charAt(0) || user.email.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-medium">
+                          {user.full_name || "No name"}
+                        </h4>
+                        {getRoleBadge(user.role)}
+                        {getStatusBadge(user.status)}
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <div className="flex items-center space-x-1">
+                          <Mail className="h-3 w-3" />
+                          <span>{user.email}</span>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        {user.phone && (
                           <div className="flex items-center space-x-1">
-                            <Mail className="h-3 w-3" />
-                            <span>{user.email}</span>
+                            <Phone className="h-3 w-3" />
+                            <span>{user.phone}</span>
                           </div>
-                          {user.phone && (
-                            <div className="flex items-center space-x-1">
-                              <Phone className="h-3 w-3" />
-                              <span>{user.phone}</span>
-                            </div>
-                          )}
-                          {user.location && (
-                            <div className="flex items-center space-x-1">
-                              <MapPin className="h-3 w-3" />
-                              <span>{user.location}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                        )}
+                        {user.location && (
                           <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
+                            <MapPin className="h-3 w-3" />
+                            <span>{user.location}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>
+                            Joined{" "}
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {user.last_login_at && (
+                          <div className="flex items-center space-x-1">
+                            <Clock className="h-3 w-3" />
                             <span>
-                              Joined{" "}
-                              {new Date(user.created_at).toLocaleDateString()}
+                              Last login{" "}
+                              {new Date(
+                                user.last_login_at
+                              ).toLocaleDateString()}
                             </span>
                           </div>
-                          {user.last_login_at && (
-                            <div className="flex items-center space-x-1">
-                              <Clock className="h-3 w-3" />
-                              <span>
-                                Last login{" "}
-                                {new Date(
-                                  user.last_login_at
-                                ).toLocaleDateString()}
-                              </span>
-                            </div>
-                          )}
-                          <span>Logins: {user.login_count}</span>
-                        </div>
+                        )}
+                        <span>Logins: {user.login_count}</span>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="flex items-center space-x-2">
-                      {/* Role Selection */}
-                      <Select
-                        value={user.role}
-                        onValueChange={(value) =>
-                          handleUpdateRole(
-                            user.user_id,
-                            value as "user" | "admin" | "moderator"
-                          )
-                        }
+                  <div className="flex items-center space-x-2">
+                    {/* Role Selection */}
+                    <Select
+                      value={user.role}
+                      onValueChange={(value) =>
+                        handleUpdateRole(
+                          user.user_id,
+                          value as "user" | "admin" | "moderator"
+                        )
+                      }
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="moderator">Moderator</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditUser(user);
+                          setIsEditDialogOpen(true);
+                          setEditUserError("");
+                        }}
                         disabled={isLoading}
                       >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="user">User</SelectItem>
-                          <SelectItem value="moderator">Moderator</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <Edit className="h-4 w-4" />
+                      </Button>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center space-x-1">
+                      {user.status === "suspended" ? (
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setEditUser(user);
-                            setIsEditDialogOpen(true);
-                            setEditUserError("");
-                          }}
+                          onClick={() => handleUnsuspendUser(user.user_id)}
                           disabled={isLoading}
                         >
-                          <Edit className="h-4 w-4" />
+                          <UserCheck className="h-4 w-4" />
                         </Button>
-
-                        {user.status === "suspended" ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUnsuspendUser(user.user_id)}
-                            disabled={isLoading}
-                          >
-                            <UserCheck className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setIsSuspendDialogOpen(true);
-                            }}
-                            disabled={isLoading}
-                          >
-                            <UserX className="h-4 w-4" />
-                          </Button>
-                        )}
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleBanUser(user.user_id, "Banned by admin")
-                          }
-                          disabled={isLoading || user.status === "banned"}
-                        >
-                          <Ban className="h-4 w-4" />
-                        </Button>
-
+                      ) : (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => {
                             setSelectedUser(user);
-                            setIsDeleteDialogOpen(true);
+                            setIsSuspendDialogOpen(true);
                           }}
                           disabled={isLoading}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <UserX className="h-4 w-4" />
                         </Button>
-                      </div>
+                      )}
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleBanUser(user.user_id, "Banned by admin")
+                        }
+                        disabled={isLoading || user.status === "banned"}
+                      >
+                        <Ban className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                        disabled={isLoading}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
 
-                {filteredUsers.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No users found matching your criteria.
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              {filteredUsers.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No users found matching your criteria.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Suspend User Dialog */}
-        <Dialog
-          open={isSuspendDialogOpen}
-          onOpenChange={setIsSuspendDialogOpen}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Suspend User</DialogTitle>
-              <DialogDescription>
-                Suspend {selectedUser?.full_name || selectedUser?.email}{" "}
-                temporarily.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
+      {/* Suspend User Dialog */}
+      <Dialog
+        open={isSuspendDialogOpen}
+        onOpenChange={setIsSuspendDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Suspend User</DialogTitle>
+            <DialogDescription>
+              Suspend {selectedUser?.full_name || selectedUser?.email}{" "}
+              temporarily.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="suspend-until">Suspend Until</Label>
+              <Input
+                id="suspend-until"
+                type="datetime-local"
+                value={suspendUntil}
+                onChange={(e) => setSuspendUntil(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="suspend-reason">Reason</Label>
+              <Textarea
+                id="suspend-reason"
+                placeholder="Enter reason for suspension..."
+                value={suspendReason}
+                onChange={(e) => setSuspendReason(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsSuspendDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSuspendUser}
+              disabled={!suspendUntil || !suspendReason || isLoading}
+            >
+              Suspend User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create User Dialog */}
+      <Dialog
+        open={isCreateDialogOpen}
+        onOpenChange={(open) => {
+          setIsCreateDialogOpen(open);
+          if (!open) {
+            setCreateUserError(""); // Clear error when closing
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Enter the details for the new user. An invitation will not be
+              sent; you must provide the password to the user.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {createUserError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{createUserError}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="new-email">Email</Label>
+              <Input
+                id="new-email"
+                type="email"
+                placeholder="user@example.com"
+                value={newUser.email}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-password">Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="••••••••"
+                value={newUser.password}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, password: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-fullname">Full Name</Label>
+              <Input
+                id="new-fullname"
+                type="text"
+                placeholder="John Doe"
+                value={newUser.full_name}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, full_name: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-role">Role</Label>
+              <Select
+                value={newUser.role}
+                onValueChange={(value) => setNewUser({ ...newUser, role: value as NewUserFormState['role'] })}
+              >
+                <SelectTrigger id="new-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="moderator">Moderator</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsCreateDialogOpen(false);
+                setCreateUserError(""); // Clear error when canceling
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateUser} disabled={isLoading}>
+              Create User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog
+        open={isEditDialogOpen}
+        onOpenChange={(open) => {
+          setIsEditDialogOpen(open);
+          if (!open) {
+            setEditUserError("");
+            setEditUser(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit User Profile</DialogTitle>
+            <DialogDescription>
+              Update user information and settings.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {editUserError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{editUserError}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="suspend-until">Suspend Until</Label>
+                <Label htmlFor="edit-fullname">Full Name</Label>
                 <Input
-                  id="suspend-until"
-                  type="datetime-local"
-                  value={suspendUntil}
-                  onChange={(e) => setSuspendUntil(e.target.value)}
+                  id="edit-fullname"
+                  type="text"
+                  value={editUser?.full_name || ""}
+                  onChange={(e) =>
+                    setEditUser(prev => prev ? { ...prev, full_name: e.target.value } : null)
+                  }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="suspend-reason">Reason</Label>
-                <Textarea
-                  id="suspend-reason"
-                  placeholder="Enter reason for suspension..."
-                  value={suspendReason}
-                  onChange={(e) => setSuspendReason(e.target.value)}
+                <Label htmlFor="edit-email">Email (Read-only)</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editUser?.email || ""}
+                  disabled
+                  className="bg-muted"
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsSuspendDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSuspendUser}
-                disabled={!suspendUntil || !suspendReason || isLoading}
-              >
-                Suspend User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
-        {/* Create User Dialog */}
-        <Dialog 
-          open={isCreateDialogOpen} 
-          onOpenChange={(open) => {
-            setIsCreateDialogOpen(open);
-            if (!open) {
-              setCreateUserError(""); // Clear error when closing
-            }
-          }}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New User</DialogTitle>
-              <DialogDescription>
-                Enter the details for the new user. An invitation will not be
-                sent; you must provide the password to the user.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              {createUserError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{createUserError}</AlertDescription>
-                </Alert>
-              )}
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="new-email">Email</Label>
+                <Label htmlFor="edit-phone">Phone</Label>
                 <Input
-                  id="new-email"
-                  type="email"
-                  placeholder="user@example.com"
-                  value={newUser.email}
+                  id="edit-phone"
+                  type="tel"
+                  value={editUser?.phone || ""}
                   onChange={(e) =>
-                    setNewUser({ ...newUser, email: e.target.value })
+                    setEditUser(prev => prev ? { ...prev, phone: e.target.value } : null)
                   }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">Password</Label>
+                <Label htmlFor="edit-location">Location</Label>
                 <Input
-                  id="new-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={newUser.password}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, password: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-fullname">Full Name</Label>
-                <Input
-                  id="new-fullname"
+                  id="edit-location"
                   type="text"
-                  placeholder="John Doe"
-                  value={newUser.full_name}
+                  value={editUser?.location || ""}
                   onChange={(e) =>
-                    setNewUser({ ...newUser, full_name: e.target.value })
+                    setEditUser(prev => prev ? { ...prev, location: e.target.value } : null)
                   }
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-website">Website</Label>
+              <Input
+                id="edit-website"
+                type="url"
+                value={editUser?.website || ""}
+                onChange={(e) =>
+                  setEditUser(prev => prev ? { ...prev, website: e.target.value } : null)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-bio">Bio</Label>
+              <Textarea
+                id="edit-bio"
+                value={editUser?.bio || ""}
+                onChange={(e) =>
+                  setEditUser(prev => prev ? { ...prev, bio: e.target.value } : null)
+                }
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="new-role">Role</Label>
+                <Label htmlFor="edit-role">Role</Label>
                 <Select
-                  value={newUser.role}
-                  onValueChange={(value) => setNewUser({ ...newUser, role: value as NewUserFormState['role'] })}
+                  value={editUser?.role || "user"}
+                  onValueChange={(value) =>
+                    setEditUser(prev => prev ? { ...prev, role: value as 'user' | 'admin' | 'moderator' } : null)
+                  }
                 >
-                  <SelectTrigger id="new-role">
+                  <SelectTrigger id="edit-role">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -831,227 +959,90 @@ export default function UserMaintenancePage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsCreateDialogOpen(false);
-                  setCreateUserError(""); // Clear error when canceling
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleCreateUser} disabled={isLoading}>
-                Create User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit User Dialog */}
-        <Dialog 
-          open={isEditDialogOpen} 
-          onOpenChange={(open) => {
-            setIsEditDialogOpen(open);
-            if (!open) {
-              setEditUserError("");
-              setEditUser(null);
-            }
-          }}
-        >
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Edit User Profile</DialogTitle>
-              <DialogDescription>
-                Update user information and settings.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              {editUserError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{editUserError}</AlertDescription>
-                </Alert>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-fullname">Full Name</Label>
-                  <Input
-                    id="edit-fullname"
-                    type="text"
-                    value={editUser?.full_name || ""}
-                    onChange={(e) =>
-                      setEditUser(prev => prev ? { ...prev, full_name: e.target.value } : null)
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-email">Email (Read-only)</Label>
-                  <Input
-                    id="edit-email"
-                    type="email"
-                    value={editUser?.email || ""}
-                    disabled
-                    className="bg-muted"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-phone">Phone</Label>
-                  <Input
-                    id="edit-phone"
-                    type="tel"
-                    value={editUser?.phone || ""}
-                    onChange={(e) =>
-                      setEditUser(prev => prev ? { ...prev, phone: e.target.value } : null)
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-location">Location</Label>
-                  <Input
-                    id="edit-location"
-                    type="text"
-                    value={editUser?.location || ""}
-                    onChange={(e) =>
-                      setEditUser(prev => prev ? { ...prev, location: e.target.value } : null)
-                    }
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <Label htmlFor="edit-website">Website</Label>
-                <Input
-                  id="edit-website"
-                  type="url"
-                  value={editUser?.website || ""}
-                  onChange={(e) =>
-                    setEditUser(prev => prev ? { ...prev, website: e.target.value } : null)
+                <Label htmlFor="edit-status">Status</Label>
+                <Select
+                  value={editUser?.status || "active"}
+                  onValueChange={(value) =>
+                    setEditUser(prev => prev ? { ...prev, status: value as 'active' | 'suspended' | 'banned' | 'pending' } : null)
                   }
-                />
+                >
+                  <SelectTrigger id="edit-status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                    <SelectItem value="banned">Banned</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="edit-bio">Bio</Label>
-                <Textarea
-                  id="edit-bio"
-                  value={editUser?.bio || ""}
-                  onChange={(e) =>
-                    setEditUser(prev => prev ? { ...prev, bio: e.target.value } : null)
+                <Label htmlFor="edit-language">Language</Label>
+                <Select
+                  value={editUser?.preferred_language || "en"}
+                  onValueChange={(value) =>
+                    setEditUser(prev => prev ? { ...prev, preferred_language: value as 'en' | 'th' } : null)
                   }
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-role">Role</Label>
-                  <Select
-                    value={editUser?.role || "user"}
-                    onValueChange={(value) => 
-                      setEditUser(prev => prev ? { ...prev, role: value as 'user' | 'admin' | 'moderator' } : null)
-                    }
-                  >
-                    <SelectTrigger id="edit-role">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="moderator">Moderator</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-status">Status</Label>
-                  <Select
-                    value={editUser?.status || "active"}
-                    onValueChange={(value) => 
-                      setEditUser(prev => prev ? { ...prev, status: value as 'active' | 'suspended' | 'banned' | 'pending' } : null)
-                    }
-                  >
-                    <SelectTrigger id="edit-status">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                      <SelectItem value="banned">Banned</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-language">Language</Label>
-                  <Select
-                    value={editUser?.preferred_language || "en"}
-                    onValueChange={(value) => 
-                      setEditUser(prev => prev ? { ...prev, preferred_language: value as 'en' | 'th' } : null)
-                    }
-                  >
-                    <SelectTrigger id="edit-language">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="th">ไทย</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                >
+                  <SelectTrigger id="edit-language">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="th">ไทย</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsEditDialogOpen(false);
-                  setEditUserError("");
-                  setEditUser(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleEditUser} disabled={isLoading}>
-                Update User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                setEditUserError("");
+                setEditUser(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleEditUser} disabled={isLoading}>
+              Update User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        {/* Delete User Dialog */}
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete User</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to permanently delete{" "}
-                {selectedUser?.full_name || selectedUser?.email}? This action
-                cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteUser}
-                disabled={isLoading}
-              >
-                Delete User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </main>
+      {/* Delete User Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete{" "}
+              {selectedUser?.full_name || selectedUser?.email}? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteUser}
+              disabled={isLoading}
+            >
+              Delete User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

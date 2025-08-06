@@ -87,8 +87,8 @@ export function DashboardNav({ onClose }: DashboardNavProps) {
   const handleLocaleChange = (nextLocale: string) => {
     console.log('Language change clicked:', nextLocale, 'current pathname:', pathname);
     
-    // Close dropdown and sidebar on mobile
-    if (onClose) {
+    // Close dropdown and sidebar only on mobile
+    if (onClose && window.innerWidth < 1024) {
       onClose();
     }
     
@@ -111,8 +111,8 @@ export function DashboardNav({ onClose }: DashboardNavProps) {
   ];
 
   const handleLinkClick = () => {
-    // Close sidebar on mobile when a link is clicked
-    if (onClose) {
+    // Close sidebar only on mobile when a link is clicked
+    if (onClose && window.innerWidth < 1024) {
       onClose();
     }
   };

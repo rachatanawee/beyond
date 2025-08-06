@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { AdminProvider } from '@/contexts/AdminContext';
 import ConditionalNav from '@/components/ConditionalNav';
+import QueryProvider from '@/components/QueryProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,12 +49,14 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <AuthProvider>
-            <AdminProvider>
-              <ConditionalNav />
-              {children}
-            </AdminProvider>
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <AdminProvider>
+                <ConditionalNav />
+                {children}
+              </AdminProvider>
+            </AuthProvider>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
