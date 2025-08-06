@@ -6,7 +6,17 @@ import { cn } from "@/lib/utils"
 import { GripVertical } from "lucide-react"
 
 // Simplified resizer component without complex types
-export function DataTableResizer({ header, table }: { header: any; table: any }) {
+interface DataTableResizerProps {
+  header: {
+    column: {
+      getIsResizing: () => boolean;
+    };
+    getResizeHandler: () => (event: React.MouseEvent | React.TouchEvent) => void;
+  };
+  table: unknown; // Not used in current implementation
+}
+
+export function DataTableResizer({ header }: DataTableResizerProps) {
   const isResizing = header.column.getIsResizing()
 
   return (

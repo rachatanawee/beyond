@@ -64,11 +64,11 @@ export function convertCase(str: string, format: CaseFormat): string {
 /**
  * Convert all keys in an object to the specified case format
  */
-export function convertObjectKeys<T extends Record<string, any>>(
+export function convertObjectKeys<T extends Record<string, unknown>>(
   obj: T,
   format: CaseFormat
-): Record<string, any> {
-  const result: Record<string, any> = {};
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   
   Object.entries(obj).forEach(([key, value]) => {
     const newKey = convertCase(key, format);
@@ -86,11 +86,11 @@ export type KeyMappingFunction = (key: string) => string;
 /**
  * Convert object keys using a custom mapping function
  */
-export function convertObjectKeysWithMapper<T extends Record<string, any>>(
+export function convertObjectKeysWithMapper<T extends Record<string, unknown>>(
   obj: T,
   mapper: KeyMappingFunction
-): Record<string, any> {
-  const result: Record<string, any> = {};
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   
   Object.entries(obj).forEach(([key, value]) => {
     const newKey = mapper(key);

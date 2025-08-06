@@ -40,8 +40,13 @@ interface DemoUser {
   lastLogin?: string;
 }
 
+// Make DemoUser compatible with ExportableData
+interface ExportableDemoUser extends DemoUser {
+  [key: string]: string | number | boolean | null | undefined; // Add index signature for ExportableData compatibility
+}
+
 // Sample data
-const sampleUsers: DemoUser[] = [
+const sampleUsers: ExportableDemoUser[] = [
   {
     id: '1',
     name: 'John Doe',
@@ -98,7 +103,13 @@ const sampleUsers: DemoUser[] = [
 ];
 
 // Mock fetch function
-const fetchDemoUsers = async (params: any) => {
+const fetchDemoUsers = async (params: {
+  page: number;
+  limit: number;
+  search: string;
+  sort_by: string;
+  sort_order: string;
+}) => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
@@ -115,10 +126,10 @@ const fetchDemoUsers = async (params: any) => {
   }
   
   // Apply sorting
-  if (sort_by) {
+  if (sort_by && sort_by in sampleUsers[0]) {
     filteredData.sort((a, b) => {
-      const aValue = a[sort_by as keyof DemoUser] || '';
-      const bValue = b[sort_by as keyof DemoUser] || '';
+      const aValue = a[sort_by as keyof ExportableDemoUser] || '';
+      const bValue = b[sort_by as keyof ExportableDemoUser] || '';
       
       if (sort_order === 'desc') {
         return bValue.toString().localeCompare(aValue.toString());
@@ -148,7 +159,7 @@ export default function AdvancedTableDemoPage() {
   usePageTitle('Advanced Table Demo');
 
   // Define columns
-  const getColumns = (handleRowDeselection?: ((rowId: string) => void) | null): ColumnDef<DemoUser>[] => [
+  const getColumns = (_handleRowDeselection?: ((rowId: string) => void) | null): ColumnDef<ExportableDemoUser>[] => [
     {
       id: 'select',
       header: ({ table }) => (
@@ -330,7 +341,7 @@ export default function AdvancedTableDemoPage() {
       </div>
 
       {/* Advanced Data Table */}
-      <DataTable
+      <DataTable<ExportableDemoUser, unknown>
         getColumns={getColumns}
         fetchDataFn={fetchDemoUsers}
         exportConfig={{

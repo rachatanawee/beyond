@@ -7,6 +7,8 @@ import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { AdminProvider } from '@/contexts/AdminContext';
+import { ErrorProvider } from '@/contexts/ErrorContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ConditionalNav from '@/components/ConditionalNav';
 import QueryProvider from '@/components/QueryProvider';
 
@@ -49,14 +51,18 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <QueryProvider>
-            <AuthProvider>
-              <AdminProvider>
-                <ConditionalNav />
-                {children}
-              </AdminProvider>
-            </AuthProvider>
-          </QueryProvider>
+          <ErrorBoundary>
+            <ErrorProvider>
+              <QueryProvider>
+                <AuthProvider>
+                  <AdminProvider>
+                    <ConditionalNav />
+                    {children}
+                  </AdminProvider>
+                </AuthProvider>
+              </QueryProvider>
+            </ErrorProvider>
+          </ErrorBoundary>
         </NextIntlClientProvider>
       </body>
     </html>

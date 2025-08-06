@@ -57,12 +57,14 @@ export function useUrlState<T>(
   const lastSetValue = useRef<T>(defaultValue);
 
   // Custom serialization/deserialization functions
-  const serialize =
+  const serialize = useMemo(() => 
     options.serialize ||
     ((value: T) =>
-      typeof value === "object" ? JSON.stringify(value) : String(value));
+      typeof value === "object" ? JSON.stringify(value) : String(value)),
+    [options.serialize]
+  );
 
-  const deserialize =
+  const deserialize = useMemo(() =>
     options.deserialize ||
     ((value: string) => {
       try {
@@ -107,13 +109,12 @@ export function useUrlState<T>(
         console.warn(`Error deserializing URL parameter ${key}: ${e}`);
         return defaultValue;
       }
-    });
+    }), [options.deserialize, defaultValue, key]);
 
   // Get the initial value from URL or use default
   const getValueFromUrl = useCallback(() => {
     // Check if we have a pending update for this key that hasn't been applied yet
     if (batchUpdateState.pendingUpdates.has(key)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return batchUpdateState.pendingUpdates.get(key)?.value as T;
     }
 
@@ -298,7 +299,7 @@ export function useUrlState<T>(
           const defaultSortOrder = "desc"; // Match the default from the component
           
           // First pass: identify which sort parameters are being updated
-          for (const [updateKey, _] of batchUpdateState.pendingUpdates.entries()) {
+          for (const [updateKey] of batchUpdateState.pendingUpdates.entries()) {
             if (updateKey === "sortBy") sortByInBatch = true;
             if (updateKey === "sortOrder") sortOrderInBatch = true;
           }

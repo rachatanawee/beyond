@@ -6,6 +6,7 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { useRouter } from "@/i18n/routing";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTranslations } from 'next-intl';
+// import { useErrorHandler } from '@/hooks/useErrorHandler'; // TODO: Implement error handling
 import { UserWithAdmin } from "@/types/admin";
 import {
   Card,
@@ -82,6 +83,7 @@ export default function UserMaintenancePage() {
   const { isAdmin, loading: adminLoading, profile: adminProfile, users, adminService, refreshUsers } = useAdmin();
   const router = useRouter();
   const t = useTranslations('Admin');
+  // const { handleAsyncOperation } = useErrorHandler(); // TODO: Implement error handling
   usePageTitle(t('manageUsers'));
   // Wait for both auth and admin contexts to finish loading
   const loading = authLoading || adminLoading;
@@ -437,7 +439,7 @@ export default function UserMaintenancePage() {
               disabled={isLoading}
             >
               <UserPlus className="mr-2 h-4 w-4" />
-              {t('createUser', { defaultValue: 'Create User' })}
+              {t('createUserButton', { defaultValue: 'Create User' })}
             </Button>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client'
 import { UserWithAdmin, AdminLog, UserStatistics, SuspendUserData, NewUserData, UpdateUserData } from '@/types/admin'
 import { ProfileService } from './profileService'
 import { UserProfile } from '@/types/profile'
+// import { handleApiResponse, NetworkError, SupabaseError, parseError } from '@/lib/error-handler' // TODO: Implement error handling
 
 export class AdminService {
   private supabase = createClient()

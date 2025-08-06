@@ -112,7 +112,7 @@
     "exportCsv": "Export CSV",
     "exportJson": "Export JSON",
     "refresh": "Refresh",
-    "createUser": "Create User",
+    "createUserButton": "Create User",
     "loading": "Loading...",
     "accessDenied": "Access Denied",
     "adminRequired": "You need admin privileges to access this page.",
@@ -175,5 +175,26 @@
     "lastLogin": "Last login",
     "firstTime": "First time login",
     "accountCreated": "Account created"
+  },
+  "Errors": {
+    "networkError": "Connection Error",
+    "networkErrorMessage": "Unable to connect to the server. Please check your internet connection.",
+    "databaseError": "Database Connection Error",
+    "databaseErrorMessage": "Unable to connect to the database. Please try again later.",
+    "offlineTitle": "You are offline",
+    "offlineMessage": "Please check your internet connection and try again.",
+    "retry": "Retry",
+    "checkingConnection": "Checking connection...",
+    "offline": "Offline",
+    "backOnline": "Back online",
+    "sessionExpired": "Session Expired",
+    "sessionExpiredMessage": "Your session has expired. Please log in again.",
+    "accessDenied": "Access Denied",
+    "accessDeniedMessage": "You do not have permission to perform this action.",
+    "serverError": "Server Error",
+    "serverErrorMessage": "Something went wrong on our end. Please try again later.",
+    "validationError": "Validation Error",
+    "unknownError": "Unknown Error",
+    "unknownErrorMessage": "An unexpected error occurred. Please try again."
   }
 }
