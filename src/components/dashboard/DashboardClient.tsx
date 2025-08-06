@@ -49,7 +49,7 @@ export function DashboardClient({ profile }: DashboardClientProps) {
             {greeting}, {profile?.full_name || 'User'}!
           </h2>
           <p className="text-muted-foreground">
-            {t('welcomeBack')}
+            Hello, {t('welcomeBack')}
           </p>
         </div>
         <div className="flex items-center space-x-2">

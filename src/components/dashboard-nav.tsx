@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useTranslations, useLocale } from 'next-intl';
@@ -80,7 +78,6 @@ function NavigationItem({ item, level = 0, onItemClick }: {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
-  const isActive = pathname === item.href || (hasChildren && item.children?.some(child => pathname === child.href));
   const isDirectMatch = pathname === item.href;
 
   const handleClick = () => {
