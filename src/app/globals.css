@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Import data table styles */
+@import '../styles/data-table.css';
+
 @custom-variant dark (&:is(.dark *));
 :root {
   --background: oklch(0.9842 0.0034 247.8575);

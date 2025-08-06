@@ -1,0 +1,76 @@
+/* Data Table Styles */
+.table-container {
+  position: relative;
+}
+
+.resizable-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.resizable-table th {
+  position: relative;
+  user-select: none;
+}
+
+.resizable-table th[data-column-resizing="true"] {
+  background-color: hsl(var(--muted));
+}
+
+/* Column resizer styles */
+.column-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.column-resizer:hover,
+.column-resizer[data-resizing="true"] {
+  opacity: 1;
+}
+
+/* Drag and drop styles */
+[data-dragging="true"] {
+  opacity: 0.8;
+  z-index: 10;
+}
+
+/* Focus styles for keyboard navigation */
+[data-focused="true"] {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.1) 50%, hsl(var(--muted)) 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Container query styles */
+@container (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .resizable-table {
+    min-width: 600px;
+  }
+}

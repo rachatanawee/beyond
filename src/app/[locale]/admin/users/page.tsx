@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useRouter } from "@/i18n/routing";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { useTranslations } from 'next-intl';
 import { UserWithAdmin } from "@/types/admin";
 import {
   Card,
@@ -80,7 +81,8 @@ export default function UserMaintenancePage() {
   const { profile: authProfile, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading, profile: adminProfile, users, adminService, refreshUsers } = useAdmin();
   const router = useRouter();
-  usePageTitle('User Maintenance');
+  const t = useTranslations('Admin');
+  usePageTitle(t('manageUsers'));
   // Wait for both auth and admin contexts to finish loading
   const loading = authLoading || adminLoading;
 
@@ -136,7 +138,7 @@ export default function UserMaintenancePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">{t('loading', { defaultValue: 'Loading...' })}</div>
       </div>
     );
   }
@@ -146,8 +148,8 @@ export default function UserMaintenancePage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-          <p className="text-muted-foreground">You need admin privileges to access this page.</p>
+          <h2 className="text-2xl font-bold mb-2">{t('accessDenied', { defaultValue: 'Access Denied' })}</h2>
+          <p className="text-muted-foreground">{t('adminRequired')}</p>
           <p className="text-sm text-muted-foreground mt-2">
             Debug: isAdmin={String(isAdmin)}, role={profile?.role}, status={profile?.status}
           </p>
@@ -400,10 +402,10 @@ export default function UserMaintenancePage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              User Maintenance
+              {t('manageUsers')}
             </h2>
             <p className="text-muted-foreground">
-              Manage user accounts, roles, and permissions
+              {t('manageUsersDescription')}
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -413,7 +415,7 @@ export default function UserMaintenancePage() {
               disabled={isLoading}
             >
               <Download className="mr-2 h-4 w-4" />
-              Export CSV
+              {t('exportCsv', { defaultValue: 'Export CSV' })}
             </Button>
             <Button
               variant="outline"
@@ -421,11 +423,11 @@ export default function UserMaintenancePage() {
               disabled={isLoading}
             >
               <Download className="mr-2 h-4 w-4" />
-              Export JSON
+              {t('exportJson', { defaultValue: 'Export JSON' })}
             </Button>
             <Button onClick={refreshUsers} disabled={isLoading}>
               <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
+              {t('refresh', { defaultValue: 'Refresh' })}
             </Button>
             <Button
               onClick={() => {
@@ -435,7 +437,7 @@ export default function UserMaintenancePage() {
               disabled={isLoading}
             >
               <UserPlus className="mr-2 h-4 w-4" />
-              Create User
+              {t('createUser', { defaultValue: 'Create User' })}
             </Button>
           </div>
         </div>
@@ -467,17 +469,17 @@ export default function UserMaintenancePage() {
         {/* Filters */}
         <Card>
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
+            <CardTitle>{t('filters', { defaultValue: 'Filters' })}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="search">Search Users</Label>
+                <Label htmlFor="search">{t('searchUsers', { defaultValue: 'Search Users' })}</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="search"
-                    placeholder="Search by name or email..."
+                    placeholder={t('searchPlaceholder', { defaultValue: 'Search by name or email...' })}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -486,41 +488,41 @@ export default function UserMaintenancePage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Status Filter</Label>
+                <Label>{t('statusFilter', { defaultValue: 'Status Filter' })}</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Statuses" />
+                    <SelectValue placeholder={t('allStatuses', { defaultValue: 'All Statuses' })} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
-                    <SelectItem value="banned">Banned</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="all">{t('allStatuses', { defaultValue: 'All Statuses' })}</SelectItem>
+                    <SelectItem value="active">{t('active', { defaultValue: 'Active' })}</SelectItem>
+                    <SelectItem value="suspended">{t('suspended', { defaultValue: 'Suspended' })}</SelectItem>
+                    <SelectItem value="banned">{t('banned', { defaultValue: 'Banned' })}</SelectItem>
+                    <SelectItem value="pending">{t('pending', { defaultValue: 'Pending' })}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Role Filter</Label>
+                <Label>{t('roleFilter', { defaultValue: 'Role Filter' })}</Label>
                 <Select value={roleFilter} onValueChange={setRoleFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Roles" />
+                    <SelectValue placeholder={t('allRoles', { defaultValue: 'All Roles' })} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="moderator">Moderator</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="all">{t('allRoles', { defaultValue: 'All Roles' })}</SelectItem>
+                    <SelectItem value="user">{t('user')}</SelectItem>
+                    <SelectItem value="moderator">{t('moderator', { defaultValue: 'Moderator' })}</SelectItem>
+                    <SelectItem value="admin">{t('admin', { defaultValue: 'Admin' })}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Results</Label>
+                <Label>{t('results', { defaultValue: 'Results' })}</Label>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <Users className="h-4 w-4" />
-                  <span>{filteredUsers.length} users found</span>
+                  <span>{t('usersFound', { defaultValue: '{count} users found', count: filteredUsers.length })}</span>
                 </div>
               </div>
             </div>
@@ -530,9 +532,9 @@ export default function UserMaintenancePage() {
         {/* Users List */}
         <Card>
           <CardHeader>
-            <CardTitle>Users ({filteredUsers.length})</CardTitle>
+            <CardTitle>{t('users', { defaultValue: 'Users' })} ({filteredUsers.length})</CardTitle>
             <CardDescription>
-              Manage user accounts and permissions
+              {t('manageUsersDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -556,7 +558,7 @@ export default function UserMaintenancePage() {
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
                         <h4 className="font-medium">
-                          {user.full_name || "No name"}
+                          {user.full_name || t('noName', { defaultValue: 'No name' })}
                         </h4>
                         {getRoleBadge(user.role)}
                         {getStatusBadge(user.status)}
@@ -583,7 +585,7 @@ export default function UserMaintenancePage() {
                         <div className="flex items-center space-x-1">
                           <Calendar className="h-3 w-3" />
                           <span>
-                            Joined{" "}
+                            {t('joined', { defaultValue: 'Joined' })}{" "}
                             {new Date(user.created_at).toLocaleDateString()}
                           </span>
                         </div>
@@ -591,14 +593,14 @@ export default function UserMaintenancePage() {
                           <div className="flex items-center space-x-1">
                             <Clock className="h-3 w-3" />
                             <span>
-                              Last login{" "}
+                              {t('lastLogin', { defaultValue: 'Last login' })}{" "}
                               {new Date(
                                 user.last_login_at
                               ).toLocaleDateString()}
                             </span>
                           </div>
                         )}
-                        <span>Logins: {user.login_count}</span>
+                        <span>{t('logins', { defaultValue: 'Logins' })}: {user.login_count}</span>
                       </div>
                     </div>
                   </div>
@@ -619,9 +621,9 @@ export default function UserMaintenancePage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="moderator">Moderator</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="user">{t('user')}</SelectItem>
+                        <SelectItem value="moderator">{t('moderator', { defaultValue: 'Moderator' })}</SelectItem>
+                        <SelectItem value="admin">{t('admin', { defaultValue: 'Admin' })}</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -692,7 +694,7 @@ export default function UserMaintenancePage() {
 
               {filteredUsers.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
-                  No users found matching your criteria.
+                  {t('noUsersFound', { defaultValue: 'No users found matching your criteria.' })}
                 </div>
               )}
             </div>
@@ -707,15 +709,17 @@ export default function UserMaintenancePage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Suspend User</DialogTitle>
+            <DialogTitle>{t('suspendUser')}</DialogTitle>
             <DialogDescription>
-              Suspend {selectedUser?.full_name || selectedUser?.email}{" "}
-              temporarily.
+              {t('suspendUserDescription', {
+                defaultValue: 'Suspend {name} temporarily.',
+                name: selectedUser?.full_name || selectedUser?.email
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="suspend-until">Suspend Until</Label>
+              <Label htmlFor="suspend-until">{t('suspendUntil')}</Label>
               <Input
                 id="suspend-until"
                 type="datetime-local"
@@ -724,10 +728,10 @@ export default function UserMaintenancePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="suspend-reason">Reason</Label>
+              <Label htmlFor="suspend-reason">{t('reason')}</Label>
               <Textarea
                 id="suspend-reason"
-                placeholder="Enter reason for suspension..."
+                placeholder={t('enterSuspendReason', { defaultValue: 'Enter reason for suspension...' })}
                 value={suspendReason}
                 onChange={(e) => setSuspendReason(e.target.value)}
               />
@@ -738,13 +742,13 @@ export default function UserMaintenancePage() {
               variant="outline"
               onClick={() => setIsSuspendDialogOpen(false)}
             >
-              Cancel
+              {t('cancel', { defaultValue: 'Cancel' })}
             </Button>
             <Button
               onClick={handleSuspendUser}
               disabled={!suspendUntil || !suspendReason || isLoading}
             >
-              Suspend User
+              {t('suspendUser')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -53,6 +53,16 @@ const navigation = [
     icon: FileText,
   },
   {
+    name: 'Data Table Demo',
+    href: '/dashboard/data-table-demo',
+    icon: FileText,
+  },
+  {
+    name: 'Advanced Table',
+    href: '/dashboard/advanced-table-demo',
+    icon: BarChart3,
+  },
+  {
     name: 'Notifications',
     href: '/dashboard/notifications',
     icon: Bell,
