@@ -4,7 +4,7 @@ import { ProfileService } from './profileService'
 import { UserProfile } from '@/types/profile'
 // import { handleApiResponse, NetworkError, SupabaseError, parseError } from '@/lib/error-handler' // TODO: Implement error handling
 
-export class AdminService {
+class AdminService {
   private supabase = createClient()
   private profileService = new ProfileService()
 
@@ -401,3 +401,7 @@ export class AdminService {
     }
   }
 }
+
+// Export singleton instance
+export const adminService = new AdminService()
+export { AdminService }

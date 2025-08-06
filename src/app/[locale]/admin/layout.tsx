@@ -1,94 +1,33 @@
-'use client';
+import { DashboardLayoutClient } from '@/components/layout/DashboardLayoutClient';
+import { getCurrentUserProfile, getUserPermissions } from '@/lib/auth/server';
+import { getMenuItemsForRole } from '@/lib/navigation/menu-config';
+import { PageTitleProvider } from '@/contexts/PageTitleContext';
+import { redirect } from 'next/navigation';
 
-import { DashboardNav } from '@/components/dashboard-nav';
-import { useState, useEffect } from 'react';
-import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { PageTitleProvider, usePageTitleContext } from '@/contexts/PageTitleContext';
-
-function AdminLayoutContent({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Default to closed, will be managed by useEffect
-  const { title } = usePageTitleContext();
+  // Get server-side user data and check admin access
+  const profile = await getCurrentUserProfile();
+  
+  // Redirect if not admin
+  if (!profile || profile.role !== 'admin') {
+    redirect('/dashboard');
+  }
 
-  // Set default sidebar state based on screen size
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) { // lg breakpoint
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
-    };
+  const permissions = await getUserPermissions();
+  const menuItems = getMenuItemsForRole(profile.role, permissions);
 
-    // Set initial state
-    handleResize();
-
-    // Listen for resize events
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return (
-    <div className="flex min-h-screen">
-      {/* Sidebar overlay for mobile */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <DashboardNav onClose={() => setSidebarOpen(false)} />
-      </div>
-
-      {/* Main content */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'}`}>
-        {/* Header with hamburger - always visible */}
-        <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen((prev) => !prev)}
-              className="p-2"
-            >
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle sidebar</span>
-            </Button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {title}
-            </h1>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
-}
-
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
   return (
     <PageTitleProvider>
-      <AdminLayoutContent>
+      <DashboardLayoutClient 
+        menuItems={menuItems}
+        userProfile={profile}
+      >
         {children}
-      </AdminLayoutContent>
+      </DashboardLayoutClient>
     </PageTitleProvider>
   );
 }

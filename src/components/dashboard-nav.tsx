@@ -1,12 +1,11 @@
 'use client';
 
+'use client';
+
 import { useAuth } from '@/contexts/AuthContext';
-import { useAdmin } from '@/contexts/AdminContext';
-import { useHydration } from '@/hooks/useHydration';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useTranslations, useLocale } from 'next-intl';
 import { useTransition } from 'react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -22,77 +21,42 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Home,
-  BarChart3,
   Settings,
-  Users,
-  Bell,
-  FileText,
-  Shield,
   LogOut,
   User,
   ChevronDown,
+  ChevronRight,
   Languages,
   X,
 } from 'lucide-react';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import type { MenuItem } from '@/lib/navigation/menu-config';
+import { getIconComponent } from '@/lib/navigation/icon-map';
 
-const navigation = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: Home,
-  },
-  {
-    name: 'Analytics',
-    href: '/dashboard/analytics',
-    icon: BarChart3,
-  },
-  {
-    name: 'Reports',
-    href: '/dashboard/reports',
-    icon: FileText,
-  },
-  {
-    name: 'Data Table Demo',
-    href: '/dashboard/data-table-demo',
-    icon: FileText,
-  },
-  {
-    name: 'Advanced Table',
-    href: '/dashboard/advanced-table-demo',
-    icon: BarChart3,
-  },
-  {
-    name: 'Notifications',
-    href: '/dashboard/notifications',
-    icon: Bell,
-  },
-];
+// Navigation is now handled by server-side menu configuration
 
 interface DashboardNavProps {
   onClose?: () => void;
+  menuItems?: MenuItem[];
+  userProfile?: {
+    id: string;
+    role: string;
+    full_name?: string;
+    avatar_url?: string;
+  } | null;
 }
 
-export function DashboardNav({ onClose }: DashboardNavProps) {
+export function DashboardNav({ onClose, menuItems = [], userProfile }: DashboardNavProps) {
   const { user, profile: authProfile, signOut } = useAuth();
-  const { isAdmin, loading: adminLoading, profile: adminProfile } = useAdmin();
   const pathname = usePathname();
-  const hydrated = useHydration();
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('Navigation');
   const [, startTransition] = useTransition();
 
-  // Use admin profile if available, fallback to auth profile
-  const profile = adminProfile || authProfile;
-
-  // Debug: log admin status (only in development)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('DashboardNav - isAdmin:', isAdmin, 'adminLoading:', adminLoading, 'profile role:', profile?.role);
-  }
-
-  // Prevent hydration mismatch by not showing admin section until hydrated and loaded
-  const shouldShowAdmin = hydrated && !adminLoading && (isAdmin || (profile?.role === 'admin' && profile?.status === 'active'));
+  // Use passed userProfile or fallback to auth profile
+  const profile = userProfile || authProfile;
 
   const handleLocaleChange = (nextLocale: string) => {
     console.log('Language change clicked:', nextLocale, 'current pathname:', pathname);
@@ -107,18 +71,105 @@ export function DashboardNav({ onClose }: DashboardNavProps) {
     });
   };
 
-  const adminNavigation = [
-    {
-      name: 'Admin Panel',
-      href: '/admin',
-      icon: Shield,
-    },
-    {
-      name: 'User Maintenance',
-      href: '/admin/users',
-      icon: Users,
-    },
-  ];
+// Navigation Item Component
+function NavigationItem({ item, level = 0, onItemClick }: {
+  item: MenuItem;
+  level?: number;
+  onItemClick?: () => void;
+}) {
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const hasChildren = item.children && item.children.length > 0;
+  const isActive = pathname === item.href || (hasChildren && item.children?.some(child => pathname === child.href));
+  const isDirectMatch = pathname === item.href;
+
+  const handleClick = () => {
+    if (hasChildren) {
+      setIsOpen(!isOpen);
+    } else if (onItemClick) {
+      onItemClick();
+    }
+  };
+
+  const itemContent = (
+    <div className={cn(
+      'flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md transition-colors group',
+      level === 0 ? 'mb-1' : 'mb-0.5',
+      level > 0 && 'ml-4 pl-6 border-l border-gray-200 dark:border-gray-700',
+      isDirectMatch
+        ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+    )}>
+      <div className="flex items-center">
+        {(() => {
+          const IconComponent = getIconComponent(item.iconName);
+          return (
+            <IconComponent
+              className={cn(
+                'mr-3 h-5 w-5 flex-shrink-0',
+                isDirectMatch
+                  ? 'text-gray-900 dark:text-gray-100'
+                  : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+              )}
+            />
+          );
+        })()}
+        <span className="truncate">{item.name}</span>
+        {item.badge && (
+          <span className={cn(
+            'ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+            item.badge.variant === 'destructive' 
+              ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+              : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+          )}>
+            {item.badge.text}
+          </span>
+        )}
+      </div>
+      
+      {hasChildren && (
+        <div className="flex items-center">
+          {isOpen ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  if (hasChildren) {
+    return (
+      <div>
+        <button
+          onClick={handleClick}
+          className="w-full text-left hover:bg-transparent p-0"
+        >
+          {itemContent}
+        </button>
+        {isOpen && (
+          <div className="space-y-1 mt-1">
+            {item.children?.map((child) => (
+              <NavigationItem
+                key={child.id}
+                item={child}
+                level={level + 1}
+                onItemClick={onItemClick}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={item.href} onClick={onItemClick}>
+      {itemContent}
+    </Link>
+  );
+}
 
   const handleLinkClick = () => {
     // Close sidebar only on mobile when a link is clicked
@@ -146,88 +197,41 @@ export function DashboardNav({ onClose }: DashboardNavProps) {
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={handleLinkClick}
-              className={cn(
-                'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
-              )}
-            >
-              <item.icon
-                className={cn(
-                  'mr-3 h-5 w-5 flex-shrink-0',
-                  isActive
-                    ? 'text-gray-900 dark:text-gray-100'
-                    : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+      {/* Server-side Navigation Menu */}
+      {menuItems.length > 0 ? (
+        <nav className="flex-1 space-y-1 px-3 py-4">
+          {/* Role Badge */}
+          {profile?.role && (
+            <div className="mb-4 px-3">
+              <div className="flex items-center space-x-2">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+                  {profile.role}
+                </span>
+                {profile.role === 'admin' && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                    Admin
+                  </span>
                 )}
-              />
-              {item.name}
-            </Link>
-          );
-        })}
-
-        {/* Admin Section */}
-        {shouldShowAdmin && (
-          <>
-            <div className="pt-6">
-              <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Administration
-              </p>
+              </div>
             </div>
-            {adminNavigation.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={handleLinkClick}
-                  className={cn(
-                    'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      'mr-3 h-5 w-5 flex-shrink-0',
-                      isActive
-                        ? 'text-gray-900 dark:text-gray-100'
-                        : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
-                    )}
-                  />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </>
-        )}
+          )}
 
-        {/* Debug Admin Status */}
-        {/* {process.env.NODE_ENV === 'development' && (
-          <div className="px-3 py-2 text-xs text-gray-500 space-y-1">
-            <div>Debug Info:</div>
-            <div>hydrated: {String(hydrated)}</div>
-            <div>hasUser: {String(!!user)}</div>
-            <div>hasAuthProfile: {String(!!authProfile)}</div>
-            <div>hasAdminProfile: {String(!!adminProfile)}</div>
-            <div>isAdmin: {String(isAdmin)}</div>
-            <div>role: {profile?.role}</div>
-            <div>status: {profile?.status}</div>
-            <div>adminLoading: {String(adminLoading)}</div>
-            <div>showAdmin: {String(shouldShowAdmin)}</div>
+          {/* Menu Items */}
+          <div className="space-y-1">
+            {menuItems.map((item) => (
+              <NavigationItem
+                key={item.id}
+                item={item}
+                onItemClick={handleLinkClick}
+              />
+            ))}
           </div>
-        )} */}
-      </nav>
+        </nav>
+      ) : (
+        <div className="flex-1 flex items-center justify-center px-3 py-4">
+          <p className="text-sm text-gray-500">Loading navigation...</p>
+        </div>
+      )}
 
       {/* User Menu */}
       <div className="flex-shrink-0 border-t border-gray-200 p-4 dark:border-gray-700">
